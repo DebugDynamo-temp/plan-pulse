@@ -1,0 +1,17 @@
+form {
+    position: absolute;
+    top: 10%;
+    left: 25%;
+    width: 50%;
+
+    #paper {
+        padding: 3px;
+        .textField {
+            margin-top: 10px;
+        }
+
+        footer {
+            margin-top: 15px;
+        }
+    }
+}
