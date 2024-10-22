@@ -1,0 +1,34 @@
+form {
+    position: absolute;
+    top: 10%;
+    left: 25%;
+    width: 50%;
+
+    #paper {
+        padding: 5px;
+
+        .textField {
+            margin-top: 10px;
+        }
+
+        a {
+            display: block;
+            margin-top: 10px;
+            color: #f50057;
+
+            &:hover {
+                color: #ab003c !important;
+            }
+
+            &:visited {
+                color: #1769aa;
+            }
+        }
+
+        footer {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}
