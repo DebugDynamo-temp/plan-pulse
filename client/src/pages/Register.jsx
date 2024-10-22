@@ -100,7 +100,7 @@ function Register() {
                     name="pswd"
                     control={control}
                     rules={{ 
-                        required: "Password is required",
+                        required: "Password is required and must be 8 characters long",
                         minLength: 8
                     }}
                     render={({ field: { onChange, value }}) => (
@@ -134,7 +134,7 @@ function Register() {
                             id='confirmPswd'
                             label='Confirm Password'
                             variant='outlined'
-                            error={errors.confirmPswd || value !== pswd? true : false}
+                            error={errors.confirmPswd || errors.pswd || value !== pswd? true : false}
                             fullWidth required
                         /> 
                     )}
