@@ -6,7 +6,7 @@ import Task from "./Task";
 
 function Board({ board }){
 	const [statusCollection, setStatus] = useState(status);
-	const [openCreateTask, setOpenCreateTask] = useState(true);
+	const [openCreateTask, setOpenCreateTask] = useState(false);
 	const [tasks, setTasks] = useState([
 		{
 			title: "One",

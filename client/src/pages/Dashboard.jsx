@@ -1,5 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserContext from "../components/User";
+import { useNavigate } from "react-router-dom";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import AppBar from "@mui/material/AppBar";
 import Board from "../components/Board";
@@ -9,6 +10,8 @@ import Typography from "@mui/material/Typography";
 
 function Dashboard({}){
 	const { user } = useContext(UserContext);
+	const [authorized, setAuthorized] = useState(false);
+	const nav = useNavigate();
 	const [boards, setBoards] = useState([
 		{
 			title: "Main", 
@@ -36,45 +39,59 @@ function Dashboard({}){
 		},
 	])
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
+
+	useEffect(() => {
+		if(user.name.length < 1 || user.email.length < 1 || user.id.length < 1){
+			setAuthorized(false);
+			return;
+		}
+
+		setAuthorized(true);
+	}, [])
 	
 	return (
 		<>
-			<header>
-				<AppBar position="static">
-					<Toolbar>
-						<Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-							PlanPulse	
-						</Typography>
-						<Typography variant="h6" component="div">
-							{ user.email }
-						</Typography>
-						<IconButton
-							size="large"
-							edge="end"
-							color="inherit"
-						>
-							<AccountCircle />
-						</IconButton>
-					</Toolbar>
-				</AppBar>
-			</header>
+			{ authorized ? 
+			<>
+				<header>
+					<AppBar position="static">
+						<Toolbar>
+							<Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+								PlanPulse	
+							</Typography>
+							<Typography variant="h6" component="div">
+								{ user.email }
+							</Typography>
+							<IconButton
+								size="large"
+								edge="end"
+								color="inherit"
+							>
+								<AccountCircle />
+							</IconButton>
+						</Toolbar>
+					</AppBar>
+				</header>
 
-			<main>
-				<aside>
-					{boards.map((b) => {
-						return (
-							<p 
-								key={`${b.title}`}
-								className={b === currentBoard ? 'selected' : ''}	
-								onClick={(e) => setCurrentBoard(b)}
-							>{ b.title }</p>
-						)
-					})}
-				</aside>
-				<section>
-					<Board board={currentBoard} />
-				</section>
-			</main>
+				<main>
+					<aside>
+						{boards.map((b) => {
+							return (
+								<p 
+									key={`${b.title}`}
+									className={b === currentBoard ? 'selected' : ''}	
+									onClick={(e) => setCurrentBoard(b)}
+								>{ b.title }</p>
+							)
+						})}
+					</aside>
+					<section>
+						<Board board={currentBoard} />
+					</section>
+				</main> 
+			</> : 
+			<p>You are not Authorized to view this page. Go <a href="/login">here</a> to login.</p>
+				}
 		</>
 	)
 }
