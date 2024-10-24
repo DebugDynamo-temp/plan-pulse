@@ -1,8 +1,9 @@
+@use 'sass:list';
 @import './css/form.scss';
 
 $blue: #2196f3;
 $pink: #f06292;
-
+$priorities: #00FF00, #33FF00, #66FF00, #99FF00, #CCFF00, #FFCC00, #FF9900, #FF6600, #FF3300, #FF0000; 
 html, body {
     margin: 0;
     padding: 0;
@@ -32,27 +33,77 @@ html, body {
         }
     }
 
-    .MuiDrawer-paper {
-        background-color: $pink;
-        color: white;
-        width: 10%;
-        
-        p {
+    main {
+        display: flex;
+
+        aside {
+            width: 10%;
             text-align: end;
-            font-size: 1.5em;
-            padding: 5px 7px;
+            background-color: $pink;
+            height: calc(100vh - 64px);
 
-            &:first-of-type {
-                margin-top: 55%;
+            p {
+                color: white;
+                margin: 0;
+                font-size: 1.5em;
+                padding: 10px;
+                vertical-align: middle;
+
+                &:hover {
+                    background-color: $blue;
+                    cursor: pointer;
+                }
+
+                &.selected {
+                    text-decoration: underline;
+                }
             }
+        }
 
-            &.selected {
-                text-decoration: underline;
+        section {
+            width: 90%;
+
+            h1 {
+                margin-left: 5%;
             }
+        }
+    }
+}
 
-            &:hover {
-                cursor: pointer;
-                background-color: $blue;
+.kanban {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+
+    & > div {
+        width: 20%;
+        border-radius: 3px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        align-self: start;
+
+        &.to_do {
+            background-color: #586BA4;
+        }
+
+        &.in_progress {
+            background-color: #F5DD90;
+        }
+
+        &.in_review {
+            background-color: #F68E5F;
+        }
+
+        &.done {
+            color: white;
+            background-color: #324376;
+        }
+
+        @each $p in $priorities {
+            $i: index($priorities, $p);
+            .priority-#{$i} {
+                fill: $p;
             }
         }
     }
