@@ -1,9 +1,15 @@
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
+import { useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import UserContext from '../components/User';
 
 function Login() {
+    const nav = useNavigate();
+    const { setUser } = useContext(UserContext);
+
     const { 
         control, 
         handleSubmit, 
@@ -21,13 +27,18 @@ function Login() {
         }
     });
 
-    function submit(data, e){
-        //send data to server to sign-in user, filtering out the confirmPswd
-        console.log(data);
+    function submit(data){
+        //send data to server to sign-in user
+        setUser({
+            name: 'Jack',
+            email: data.email,
+            id: 0
+        }) 
+        nav('/dashboard');
     }
 
     return ( 
-        <form onSubmit={handleSubmit(submit)}>
+        <form className="authForm" onSubmit={handleSubmit(submit)}>
             <Paper id="paper">
                 <h1>Sign In:</h1>
                 <Controller

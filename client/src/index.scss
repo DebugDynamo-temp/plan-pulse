@@ -1,14 +1,17 @@
+@use 'sass:list';
 @import './css/form.scss';
+@import './css/createTask.scss';
 
 $blue: #2196f3;
-$pink: #f50057;
+$pink: #f06292;
+$priorities: #00FF00, #33FF00, #66FF00, #99FF00, #CCFF00, #FFCC00, #FF9900, #FF6600, #FF3300, #FF0000; 
 
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
     font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
-    background-color: $blue;
+    background-color: white;
 
     .landing {
         position: absolute;
@@ -29,6 +32,89 @@ html, body {
             justify-content: space-evenly;
             width: 100%;
             margin-top: 10%;
+        }
+    }
+
+    main {
+        display: flex;
+
+        aside {
+            width: 10%;
+            text-align: end;
+            background-color: $pink;
+            height: calc(100vh - 64px);
+
+            p {
+                color: white;
+                margin: 0;
+                font-size: 1.5em;
+                padding: 10px;
+                vertical-align: middle;
+
+                &:hover {
+                    background-color: $blue;
+                    cursor: pointer;
+                }
+
+                &.selected {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        section {
+            width: 90%;
+
+            header {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 5%;
+                align-items: center;
+                
+                button {
+                    height: 70%;
+                }
+            }
+        }
+    }
+}
+
+.kanban {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+
+    & > div {
+        width: 20%;
+        border-radius: 3px;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        align-self: start;
+        align-items: center;
+
+        &.to_do {
+            background-color: #586BA4;
+        }
+
+        &.in_progress {
+            background-color: #F5DD90;
+        }
+
+        &.in_review {
+            background-color: #F68E5F;
+        }
+
+        &.done {
+            color: white;
+            background-color: #324376;
+        }
+
+        @each $p in $priorities {
+            $i: index($priorities, $p);
+            .priority-#{$i} {
+                fill: $p;
+            }
         }
     }
 }
