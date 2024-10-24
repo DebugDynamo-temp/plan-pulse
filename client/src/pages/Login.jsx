@@ -38,7 +38,7 @@ function Login() {
     }
 
     return ( 
-        <form onSubmit={handleSubmit(submit)}>
+        <form className="authForm" onSubmit={handleSubmit(submit)}>
             <Paper id="paper">
                 <h1>Sign In:</h1>
                 <Controller

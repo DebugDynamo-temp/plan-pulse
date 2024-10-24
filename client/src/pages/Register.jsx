@@ -33,7 +33,7 @@ function Register() {
     }
 
     return ( 
-        <form onSubmit={handleSubmit(submit)}>
+        <form className="authForm" onSubmit={handleSubmit(submit)}>
             <Paper id="paper">
                 <h1>Sign Up:</h1>
                 <Controller

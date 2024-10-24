@@ -1,9 +1,11 @@
 @use 'sass:list';
 @import './css/form.scss';
+@import './css/createTask.scss';
 
 $blue: #2196f3;
 $pink: #f06292;
 $priorities: #00FF00, #33FF00, #66FF00, #99FF00, #CCFF00, #FFCC00, #FF9900, #FF6600, #FF3300, #FF0000; 
+
 html, body {
     margin: 0;
     padding: 0;
@@ -63,8 +65,15 @@ html, body {
         section {
             width: 90%;
 
-            h1 {
-                margin-left: 5%;
+            header {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 5%;
+                align-items: center;
+                
+                button {
+                    height: 70%;
+                }
             }
         }
     }
@@ -82,6 +91,7 @@ html, body {
         display: flex;
         flex-direction: column;
         align-self: start;
+        align-items: center;
 
         &.to_do {
             background-color: #586BA4;
