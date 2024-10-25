@@ -51,3 +51,4 @@ Thumbs.db
 # Application-specific
 /src/main/resources/application.properties
 
+node_modules
