@@ -7,6 +7,7 @@ import Board from "../components/Board";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { TaskProvider } from "../components/TaskContext";
 
 function Dashboard({}){
 	const { user } = useContext(UserContext);
@@ -30,13 +31,7 @@ function Dashboard({}){
 			type: "PUBLIC",
 			creatorId: "0",
 			collaboratorIds: [1, 2, 3],
-		},
-		{
-			title: "Job", 
-			type: "PRIVATE",
-			creatorId: "0",
-			collaboratorIds: [1, 2, 3],
-		},
+		}
 	])
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
@@ -48,6 +43,10 @@ function Dashboard({}){
 
 		setAuthorized(true);
 	}, [])
+
+	useEffect(() => {
+
+	}, [currentBoard]);
 	
 	return (
 		<>
@@ -84,9 +83,12 @@ function Dashboard({}){
 								>{ b.title }</p>
 							)
 						})}
+						<p>+</p>
 					</aside>
 					<section>
-						<Board board={currentBoard} />
+						<TaskProvider>
+							<Board board={currentBoard} />
+						</TaskProvider>
 					</section>
 				</main> 
 			</> : 
