@@ -8,11 +8,13 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { TaskProvider } from "../components/TaskContext";
+import { Menu, MenuItem } from "@mui/material";
 
 function Dashboard({}){
-	const { user } = useContext(UserContext);
+	const { user, setUser } = useContext(UserContext);
 	const [authorized, setAuthorized] = useState(false);
 	const nav = useNavigate();
+	const [anchorEl, setAnchorEl] = useState(null);
 	const [boards, setBoards] = useState([
 		{
 			title: "Main", 
@@ -43,10 +45,6 @@ function Dashboard({}){
 
 		setAuthorized(true);
 	}, [])
-
-	useEffect(() => {
-
-	}, [currentBoard]);
 	
 	return (
 		<>
@@ -62,12 +60,29 @@ function Dashboard({}){
 								{ user.email }
 							</Typography>
 							<IconButton
+								onClick={(e) => setAnchorEl(e.currentTarget)}
 								size="large"
 								edge="end"
 								color="inherit"
 							>
 								<AccountCircle />
 							</IconButton>
+							<Menu
+								anchorEl={anchorEl}
+								anchorOrigin={{
+									vertical: 'top',
+									horizontal: 'right'
+								}}
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'right'
+								}}
+								open={Boolean(anchorEl)}
+								onClose={(e) => setAnchorEl(null)}
+								keepMounted
+							>
+								<MenuItem onClick={(e) => {setUser(null); nav('/');}}>Logout</MenuItem>
+							</Menu>
 						</Toolbar>
 					</AppBar>
 				</header>

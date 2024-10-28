@@ -2,6 +2,8 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useForm, Controller } from 'react-hook-form';
+import { useContext } from 'react';
+import User from '../components/User';
 
 function Register() {
     const { 
@@ -25,11 +27,18 @@ function Register() {
         }
     });
     const pswd = watch('pswd', '');
+    const { setUser } = useContext(User);
 
     function submit(data, e){
         //send data to server to create user, filtering out the confirmPswd
         delete data.confirmPswd;
-        console.log(data);
+
+        setUser({
+            name: 'Jack',
+            email: data.email,
+            id: 0
+        }) 
+        nav('/dashboard');
     }
 
     return ( 
