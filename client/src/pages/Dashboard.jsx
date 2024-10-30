@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import UserContext from "../components/User";
+import UserContext from "../contexts/User";
 import { useNavigate } from "react-router-dom";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import AppBar from "@mui/material/AppBar";
@@ -7,14 +7,17 @@ import Board from "../components/Board";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { TaskProvider } from "../components/TaskContext";
+import TaskContext, { TaskProvider } from "../contexts/TaskContext";
 import { Menu, MenuItem } from "@mui/material";
+import CreateBoardDialog from "../components/CreateBoardDialog";
 
 function Dashboard({}){
-	const { user, setUser } = useContext(UserContext);
-	const [authorized, setAuthorized] = useState(false);
-	const nav = useNavigate();
 	const [anchorEl, setAnchorEl] = useState(null);
+	const [authorized, setAuthorized] = useState(true);
+	const { tasks, setTasks } = useContext(TaskContext);
+	const nav = useNavigate();
+	const [openCreateBoard, setOpenCreateBoard] = useState(false);
+	const { user, setUser } = useContext(UserContext);
 	const [boards, setBoards] = useState([
 		{
 			title: "Main", 
@@ -37,14 +40,21 @@ function Dashboard({}){
 	])
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
-	useEffect(() => {
+	function addBoard(newBoard){
+		newBoard.creatorId = 0;
+		setBoards([...boards, newBoard]);
+		setTasks({...tasks, [newBoard.title]: []});
+		setCurrentBoard(newBoard.title);
+	}
+
+	/*useEffect(() => {
 		if(user.name.length < 1 || user.email.length < 1 || user.id.length < 1){
 			setAuthorized(false);
 			return;
 		}
 
 		setAuthorized(true);
-	}, [])
+	}, [])*/
 	
 	return (
 		<>
@@ -98,14 +108,13 @@ function Dashboard({}){
 								>{ b.title }</p>
 							)
 						})}
-						<p>+</p>
+						<p onClick={(e) => setOpenCreateBoard(true)}>+</p>
 					</aside>
 					<section>
-						<TaskProvider>
-							<Board board={currentBoard} />
-						</TaskProvider>
+						<Board board={currentBoard} />
 					</section>
 				</main> 
+				<CreateBoardDialog open={openCreateBoard} close={() => setOpenCreateBoard(false)} addBoard={addBoard} />
 			</> : 
 			<p>You are not Authorized to view this page. Go <a href="/login">here</a> to login.</p>
 				}

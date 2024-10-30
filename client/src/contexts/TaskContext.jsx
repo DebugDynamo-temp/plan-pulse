@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 const TaskContext = createContext();
 
 const TaskProvider = ({ children }) => {
-	const tasks = {
+	const [tasks, setTasks] = useState({
 	"Main": [
 			{
 				title: "One",
@@ -74,10 +74,10 @@ const TaskProvider = ({ children }) => {
 			deadline: new Date(),
 			status: "IN_REVIEW"
 		},
-	]};
+	]});
 
 	return (
-		<TaskContext.Provider value={{ tasks }}>
+		<TaskContext.Provider value={{ tasks, setTasks }}>
 			{children}
 		</TaskContext.Provider>
 	)

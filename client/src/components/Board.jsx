@@ -2,12 +2,11 @@ import Button from "@mui/material/Button";
 import CreateTaskDialog from "./CreateTaskDialog";
 import { status, statusToReadable } from "../services/utils";
 import { useContext, useEffect, useState } from "react";
-import Task from "./Task";
-import TaskContext from "../components/TaskContext";
+import TaskSummary from "./TaskSummary";
+import TaskContext from "../contexts/TaskContext";
 
 function Board({ board }){
 	const { tasks } = useContext(TaskContext);
-	const [statusCollection, setStatus] = useState(status);
 	const [openCreateTask, setOpenCreateTask] = useState(false);
 	const [displayTasks, setTasks] = useState(tasks[board.title]);
 
@@ -27,7 +26,6 @@ function Board({ board }){
 	}
 
 	useEffect(() => {
-		console.log(board.title);
 		setTasks([...tasks[board.title]]);
 	}, [board])
 
@@ -51,7 +49,7 @@ function Board({ board }){
 							{displayTasks.filter((t) => {
 								return t.status === s;
 							}).map((t) => {
-								return <Task task={t} key={t.title} />
+								return <TaskSummary task={t} key={t.title} />
 							})}
 						</div>
 					)
