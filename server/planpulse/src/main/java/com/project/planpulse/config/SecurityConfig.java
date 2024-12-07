@@ -1,6 +1,6 @@
 package com.project.planpulse.config;
 
-import com.project.planpulse.auth.JwtAuthenticationFilter;
+import com.project.planpulse.filter.JwtAuthenticationFilter;
 import com.project.planpulse.filter.RateLimitingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
