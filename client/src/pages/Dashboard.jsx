@@ -48,7 +48,6 @@ function Dashboard({}){
 	
 	return (
 		<>
-			{ authorized ? 
 			<>
 				<header>
 					<AppBar position="static">
@@ -106,9 +105,7 @@ function Dashboard({}){
 						</TaskProvider>
 					</section>
 				</main> 
-			</> : 
-			<p>You are not Authorized to view this page. Go <a href="/login">here</a> to login.</p>
-				}
+			</>
 		</>
 	)
 }

@@ -27,7 +27,6 @@ function Board({ board }){
 	}
 
 	useEffect(() => {
-		console.log(board.title);
 		setTasks([...tasks[board.title]]);
 	}, [board])
 
