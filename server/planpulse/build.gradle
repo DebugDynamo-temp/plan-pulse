@@ -5,7 +5,6 @@ plugins {
 }
 
 group = 'com.project'
-version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
@@ -24,34 +23,44 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter'
+    // Spring Web (Spring MVC)
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring Data MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.apache.kafka:kafka-clients:3.4.0'
-    implementation 'com.sendgrid:sendgrid-java:4.10.3'
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // JWT Support
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // for Jackson support JSON serialization/deserialization
+
+    // Redis Client
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Apache Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.apache.kafka:kafka-clients:3.7.1'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // SendGrid
+    implementation 'com.sendgrid:sendgrid-java:4.10.3'
+
     implementation 'io.github.bucket4j:bucket4j-core:8.12.0'
     implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
 
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'  // Jackson for JSON serialization/deserialization
-
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
-
-//    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-//    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-//    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'  // Jackson for JSON serialization/deserialization
-
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {

@@ -3,39 +3,34 @@ package com.project.planpulse.controller;
 import com.project.planpulse.model.Board;
 import com.project.planpulse.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/boards")
+@RequestMapping("/boards")
 public class BoardController {
 
     @Autowired
     private BoardService boardService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Board> createBoard(@RequestBody Board board) {
-        Board createdBoard = boardService.createBoard(board);
-        return ResponseEntity.ok(createdBoard);
+    @PostMapping
+    public Board createBoard(@RequestBody Board board) {
+        return boardService.createBoard(board);
     }
 
-    @GetMapping("/{boardId}")
-    public ResponseEntity<Board> getBoardById(@PathVariable String boardId) {
-        return boardService.findBoardById(boardId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/{id}")
+    public Board getBoardById(@PathVariable String id) {
+        return boardService.getBoardById(id);
     }
 
-    @GetMapping("/user/{creatorId}")
-    public ResponseEntity<List<Board>> getBoardsByUser(@PathVariable String creatorId) {
-        return ResponseEntity.ok(boardService.findBoardsByCreatorId(creatorId));
+    @GetMapping("/creator/{creatorId}")
+    public List<Board> getBoardsByCreator(@PathVariable String creatorId) {
+        return boardService.getBoardsByCreator(creatorId);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Board> updateBoard(@RequestBody Board board) {
-        boardService.updateBoard(board);
-        return ResponseEntity.ok(board);
+    @PostMapping("/{boardId}/collaborators")
+    public void addCollaborator(@PathVariable String boardId, @RequestBody String userId) {
+        boardService.addCollaborator(boardId, userId);
     }
 }
