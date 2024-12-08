@@ -34,6 +34,7 @@ public class UserService {
         String email = userData.get("email");
         String password = userData.get("password");
         String confirmPassword = userData.get("confirmPassword");
+
         if (firstName == null || firstName.isBlank()) {
             throw new RuntimeException("Firstname is required");
         }
@@ -62,6 +63,8 @@ public class UserService {
         }
         // create and save new User
         User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));

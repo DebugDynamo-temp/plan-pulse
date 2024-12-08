@@ -52,10 +52,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // SendGrid
-    implementation 'com.sendgrid:sendgrid-java:4.10.3'
+    // Emailing service
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-    implementation 'io.github.bucket4j:bucket4j-core:8.12.0'
     implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
 

@@ -2,31 +2,41 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: PlanPulse
   data:
     mongodb:
-      uri: mongodb://localhost:27017/planpulse_db
-
-security:
-  oauth2:
-    client:
-      registration:
-        google:
-          client-id:
-          client-secret:
-          scope:
-          redirect-uri:
-
-kafka:
-  bootstrap-servers: localhost:9092
-
-sendgrid:
-  api-key: ${SENDGRID_API_KEY}
+      uri: mongodb+srv://temp:temppassword@cluster0.o3udu.mongodb.net/planpulse_db
+  redis:
+    host: localhost
+    port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: planpulse.no.reply@gmail.com
+    password: ${PLANPULSE_EMAIL_GOOGLE_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
-  secret: ${JWT_SECRET_KEY}
-  expiration: 86400000 # 24 hours in milliseconds
+  secret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmdWxsc3RhY2stcHJvamVjdCIsIm5hbWUiOiJQbGFuUHVsc2UiLCJpYXQiOjE2MTYyMzkwMjJ9.Aks1d25iN1yQN1AnPgS68P1QbvFBTfV5oU5h2Alz1I8 # secret key for signing JWT tokens
+  expiration: 86400000      # token expiration in milliseconds (24 hours)
 
 logging:
   level:
     root: INFO
     com.project.planpulse: DEBUG
+
+app:
+  reset-password-url: https://planpulse.com/reset-password?token= # frontend URL for password reset link
+  frontend-url: https://planpulse.com
+
+security:
+  headers:
+    frame-options: DENY # protect against clickjacking
+    content-security-policy: "default-src 'self'; script-src 'self'" # Basic CSP for added security
+
