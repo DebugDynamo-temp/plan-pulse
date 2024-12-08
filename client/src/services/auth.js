@@ -1,5 +1,5 @@
 const headers = new Headers({
-    'Content-type': 'application/json'
+    'Content-Type': 'application/json'
 })
 
 async function login(email, pswd){
@@ -15,20 +15,22 @@ async function login(email, pswd){
     console.log(response);
 }
 
-async function register(first, last, email, pswd, confirmPswd){
+async function register(first, last, email, uname, pswd, confirmPswd){
+    let formData = new FormData();
+    formData.append('firstname', first)
+    formData.append('lastname', last)
+    formData.append('email', email)
+    formData.append('username', uname);
+    formData.append('confirmPassword', pswd)
+    formData.append('password', confirmPswd)
+    formData.append('profile_image', '');
+
     let response = await fetch('http://localhost:8080/auth/register', {
         method: "POST",
-        body: JSON.stringify({
-            firstname: first,
-            lastname: last,
-            email: email,
-            password: pswd,
-            confirmPswd: confirmPswd
-        }),
-        headers: headers
+        body: formData 
     })
 
-    console.log(response);
+    response = await response.json();
 }
 
 async function logout(token){

@@ -43,7 +43,7 @@ function Dashboard(){
 			console.log(boards);
 			setBoards(boards);
 		}
-		getBoardsByUser();		
+		//getBoardsByUser();		
 
 		return () => {
 

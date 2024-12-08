@@ -25,6 +25,7 @@ function Register() {
             fname: '',
             lname: '',
             email: '',
+            uname: '',
             pswd: '',
             confirmPswd: ''
         }
@@ -34,7 +35,7 @@ function Register() {
 
     function submit(data, e){
         //send data to server to create user, filtering out the confirmPswd
-        register(data);
+        register(data.first, data.last, data.email, data.uname, data.pswd, data.confirmPswd);
         setUser({
             name: 'Jack',
             email: data.email,
@@ -109,6 +110,25 @@ function Register() {
                     )}
                 />
                 <Controller
+                    name="uname"
+                    control={control}
+                    rules={{ required: "Username is required." }}
+                    render={({ field: { onChange, value }}) => (
+                        <TextField 
+                            className='textField' 
+                            value={value}
+                            onChange={onChange}
+                            id='uname' 
+                            label='Username' 
+                            variant='outlined' 
+                            error={errors.fname ? true : false} 
+                            helperText={errors.fname?.message}
+                            autoComplete='username'
+                            fullWidth required 
+                        /> 
+                    )}
+                />
+                <Controller
                     name="pswd"
                     control={control}
                     rules={{ 
@@ -147,6 +167,7 @@ function Register() {
                             id='confirmPswd'
                             label='Confirm Password'
                             variant='outlined'
+                            autoComplete='new-password'
                             error={errors.confirmPswd || errors.pswd || value !== pswd? true : false}
                             fullWidth required
                         /> 
