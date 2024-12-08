@@ -1,4 +1,5 @@
 import Button from '@mui/material/Button';
+import CustomSnackbar from '../components/Snackbar';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useContext } from 'react';
@@ -81,6 +82,7 @@ function Login() {
                     )}
                 />
                 <a href='/register'>Don't have an account?</a>
+                <a href='/forgot-password'>Forgot your password?</a>
                 <footer>
                     <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
                     <Button variant='contained' type='submit' disabled={!isDirty || !isValid} >Login</Button>

@@ -1,16 +1,15 @@
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import { useContext, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import UserContext from '../components/User';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CustomSnackbar from '../components/Snackbar';
 import Typography from '@mui/material/Typography';
 
-function UserProfile(){
+function ForgotPassword(){
     const nav = useNavigate();
-    const { user, setUser } = useContext(UserContext);
+    const [urlParams, setParams] = useSearchParams();
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const { 
@@ -21,11 +20,12 @@ function UserProfile(){
             isDirty,
             isValid
         },
-        reset
+        reset,
+        setValue
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            email: user.email,
+            email: '',
         }
     });
 
@@ -37,11 +37,17 @@ function UserProfile(){
         setOpenSnackbar(false);
     }
 
+    useEffect(() => {
+        if(urlParams.get('email')){
+            setValue('email', urlParams.get('email'));
+        }
+    }, [])
+
     return (
         <section>
             <form className="profile" onSubmit={handleSubmit(submit)}>
                 <Paper id="paper">
-                    <Typography variant="h3">{user.name}</Typography>
+                    <Typography variant="h3">Email</Typography>
                     <Controller
                         name="email"
                         control={control}
@@ -66,16 +72,15 @@ function UserProfile(){
                             /> 
                         )}
                     />
-                    <a href={`/forgot-password?email=${user.email}`}>Change password?</a>
                     <footer>
                         <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
-                        <Button variant='contained' type='submit'>Update Email</Button>
+                        <Button variant='contained' type='submit' disabled={!isDirty || !isValid}>Send Password Reset</Button>
                     </footer>
                 </Paper> 
             </form>
-            <CustomSnackbar open={openSnackbar} close={closeSnackbar} msg={"Email changed!"} />
+            <CustomSnackbar open={openSnackbar} close={closeSnackbar} msg="Password reset email sent!" />
         </section>
     )
 }
 
-export default UserProfile;
+export default ForgotPassword;

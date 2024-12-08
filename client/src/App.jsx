@@ -12,6 +12,7 @@ import { ThemeProvider } from '@mui/material';
 import { theme } from './components/Theme';
 import Kanban from './components/Kanban';
 import NotFound from './pages/NotFound';
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </UserProvider>
