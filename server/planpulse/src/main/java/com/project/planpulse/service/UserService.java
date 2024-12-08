@@ -34,7 +34,7 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private static final String UPLOAD_DIR = "uploads";
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
 
     // Register user with multipart (including optional profile image)
     public User registerUserWithMultipart(String firstName,
@@ -130,23 +130,55 @@ public class UserService {
         }
     }
 
-    private String storeProfileImage(MultipartFile file) throws IOException {
-        // unique filename generated
+    private String storeProfileImage(MultipartFile file) throws IOException, RuntimeException {
+        if (file.isEmpty()) {
+            throw new RuntimeException("File is empty. Please upload a valid image.");
+        }
+        // validate MIME type
+        String contentType = file.getContentType();
+        if (contentType == null || !isValidImageMimeType(contentType)) {
+            throw new RuntimeException("Invalid file type. Only image files are allowed.");
+        }
         String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !hasValidImageExtension(originalFilename)) {
+            throw new RuntimeException("Invalid file extension. Supported formats are: .jpg, .jpeg, .png, .gif.");
+        }
+        // unique filename generated
         String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
+        if (originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
         }
-
-        String uniqueFilename = UUID.randomUUID() + String.valueOf(System.currentTimeMillis()) + extension;
+        String uniqueFilename = UUID.randomUUID() + "_" + System.currentTimeMillis() + extension;
+        // Create directory if it does not exist
         File uploadDir = new File(UPLOAD_DIR);
         if (!uploadDir.exists()) {
             boolean uploadResult = uploadDir.mkdirs();
-            if (!uploadResult) throw new IOException("Error creating the file directory.");
+            if (!uploadResult) throw new IOException("Failed to create upload directory: " + UPLOAD_DIR);
         }
+        // save file to the uploads directory
         Path filePath = Paths.get(UPLOAD_DIR, uniqueFilename);
         Files.write(filePath, file.getBytes(), StandardOpenOption.CREATE_NEW);
+        System.out.println("File saved to: " + filePath.toAbsolutePath());
+        // relative URL for storage in the database
         return "/uploads/" + uniqueFilename;
+    }
+
+    private boolean isValidImageMimeType(String mimeType) {
+        return mimeType.equals("image/jpeg") ||
+                mimeType.equals("image/png") ||
+                mimeType.equals("image/gif") ||
+                mimeType.equals("image/webp") ||
+                mimeType.equals("image/bmp");
+    }
+
+    private boolean hasValidImageExtension(String filename) {
+        String lowerCaseFilename = filename.toLowerCase();
+        return lowerCaseFilename.endsWith(".jpg") ||
+                lowerCaseFilename.endsWith(".jpeg") ||
+                lowerCaseFilename.endsWith(".png") ||
+                lowerCaseFilename.endsWith(".gif") ||
+                lowerCaseFilename.endsWith(".webp") ||
+                lowerCaseFilename.endsWith(".bmp");
     }
 
     private void deleteOldProfileImage(String imageUrl) {
@@ -158,6 +190,7 @@ public class UserService {
         Path oldFilePath = Paths.get(UPLOAD_DIR, filename);
         try {
             Files.deleteIfExists(oldFilePath);
+            System.out.println("Deleted old profile image: " + oldFilePath.toAbsolutePath());
         } catch (IOException e) {
             System.err.println("Failed to delete old profile image: " + oldFilePath.toString() + " - " + e.getMessage());
         }

@@ -22,13 +22,13 @@ public class AuthController {
     // Signup
     @PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public Map<String, String> register(
-            @RequestParam String firstname,
-            @RequestParam String lastname,
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
-            @RequestParam(required = false) MultipartFile profileImage,
+            @RequestParam(name = "firstname") String firstname,
+            @RequestParam(name = "lastname") String lastname,
+            @RequestParam(name = "username") String username,
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "password") String password,
+            @RequestParam(name = "confirmPassword") String confirmPassword,
+            @RequestParam(name = "profileImage", required = false) MultipartFile profileImage,
             HttpServletResponse response) throws IOException {
         User registeredUser = userService.registerUserWithMultipart(firstname, lastname, username, email, password, confirmPassword, profileImage);
         String token = JwtUtil.generateToken(registeredUser.getId());
