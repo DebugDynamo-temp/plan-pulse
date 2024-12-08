@@ -24,7 +24,7 @@ spring:
 
 jwt:
   secret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmdWxsc3RhY2stcHJvamVjdCIsIm5hbWUiOiJQbGFuUHVsc2UiLCJpYXQiOjE2MTYyMzkwMjJ9.Aks1d25iN1yQN1AnPgS68P1QbvFBTfV5oU5h2Alz1I8 # secret key for signing JWT tokens
-  expiration: 86400000      # token expiration in milliseconds (24 hours)
+  expiration: 86400      # token expiration in seconds (24 hours)
 
 logging:
   level:
