@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -27,20 +28,18 @@ public class UserController {
 
     // Update user profile
     @PutMapping("/profile")
-    public User updateUserProfile(Authentication authentication, @Valid @RequestBody User updatedUser) {
+    public User updateUserProfile(Authentication authentication, @RequestBody HashMap<String, Object> updates) {
         String userId = authentication.getName(); // Get user ID from JWT token
-        return userService.updateUser(userId, updatedUser);
+        return userService.updateUser(userId, updates);
     }
 
     // Delete own account
-    @DeleteMapping("/me")
+    @DeleteMapping("/profile")
     public Map<String, String> deleteUserProfile(Authentication authentication, HttpServletResponse response) {
         String userId = authentication.getName();
         userService.deleteUser(userId);
-
         // Remove JWT cookie as user is deleted
         removeTokenCookie(response);
-
         return Map.of("message", "User account deleted successfully");
     }
 

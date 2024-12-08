@@ -1,9 +1,6 @@
 package com.project.planpulse.service;
 
-import com.project.planpulse.model.Task;
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.SendGrid;
+import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
@@ -12,16 +9,24 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+import com.sendgrid.Method;
+import com.sendgrid.SendGrid;
+
 @Service
 public class EmailService {
+
     @Value("${sendgrid.api.key}")
     private String sendGridApiKey;
 
-    public void sendTaskNotification(String toEmail, Task task) throws IOException {
+    @Value("${app.reset-password-url}")
+    private String resetPasswordUrl; // https://frontend.com/reset-password?token=
+
+    public void sendPasswordResetEmail(String toEmail, String token) throws IOException {
         Email from = new Email("no-reply@planpulse.com");
-        String subject = "New Task Assigned: " + task.getTitle();
+        String subject = "Password Reset Request";
         Email to = new Email(toEmail);
-        Content content = new Content("text/plain", "You have been assigned a new task: " + task.getDescription());
+        String resetLink = resetPasswordUrl + token;
+        Content content = new Content("text/plain", "Click the link to reset your password: " + resetLink);
         Mail mail = new Mail(from, subject, to, content);
         SendGrid sg = new SendGrid(sendGridApiKey);
         Request request = new Request();

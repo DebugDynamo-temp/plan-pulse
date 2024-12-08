@@ -2,6 +2,7 @@ package com.project.planpulse.config;
 
 import com.project.planpulse.filter.JwtAuthenticationFilter;
 import com.project.planpulse.filter.RateLimitingFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +23,16 @@ public class SecurityConfig {
     private RateLimitingFilter rateLimitingFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**")
                                 .permitAll().anyRequest().authenticated())
                 .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class);
+                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(
+                        (req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                ));
 
         return http.build();
     }
