@@ -5,13 +5,20 @@ import com.project.planpulse.model.User;
 import com.project.planpulse.repository.PasswordResetTokenRepository;
 import com.project.planpulse.repository.UserRepository;
 import com.project.planpulse.validation.PasswordValidator;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -27,14 +34,79 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public User registerUser(HashMap<String, String> userData) {
-        String firstName = userData.get("firstname");
-        String lastName = userData.get("lastname");
-        String username = userData.get("username");
-        String email = userData.get("email");
-        String password = userData.get("password");
-        String confirmPassword = userData.get("confirmPassword");
+    private static final String UPLOAD_DIR = "uploads";
 
+    // Register user with multipart (including optional profile image)
+    public User registerUserWithMultipart(String firstName,
+                                          String lastName,
+                                          String username,
+                                          String email,
+                                          String password,
+                                          String confirmPassword,
+                                          MultipartFile profileImage) throws IOException {
+        validateUserRegistrationFields(firstName, lastName, username, email, password, confirmPassword);
+        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Username or Email already exists");
+        }
+        // If profile image is provided, store it
+        String profileImageUrl = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageUrl = storeProfileImage(profileImage);
+        }
+
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setProfileImageUrl(profileImageUrl);
+        return userRepository.save(user);
+    }
+
+    // Update user with multipart (including optional profile image)
+    public User updateUserWithMultipart(String userId,
+                                        String username,
+                                        String email,
+                                        String firstname,
+                                        String lastname,
+                                        MultipartFile profileImage) throws IOException, RuntimeException {
+        User existingUser = getUserById(userId);
+        // Update fields if provided
+        if (username != null && !username.isBlank()) {
+            if (!existingUser.getUsername().equals(username) && userRepository.existsByUsername(username)) {
+                throw new RuntimeException("Username already taken");
+            }
+            existingUser.setUsername(username);
+        }
+        if (email != null && !email.isBlank()) {
+            if (!existingUser.getEmail().equals(email) && userRepository.existsByEmail(email)) {
+                throw new RuntimeException("Email already in use");
+            }
+            existingUser.setEmail(email);
+        }
+        if (firstname != null && !firstname.isBlank()) {
+            existingUser.setFirstName(firstname);
+        }
+        if (lastname != null && !lastname.isBlank()) {
+            existingUser.setLastName(lastname);
+        }
+        // handle profile image update if new image is provided
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String oldImageUrl = existingUser.getProfileImageUrl();
+            // store the new image first
+            String newImageUrl = storeProfileImage(profileImage);
+            // delete old image if it exists
+            if (oldImageUrl != null && !oldImageUrl.isBlank()) {
+                deleteOldProfileImage(oldImageUrl);
+            }
+            // update user with the new URL
+            existingUser.setProfileImageUrl(newImageUrl);
+        }
+        return userRepository.save(existingUser);
+    }
+
+    private void validateUserRegistrationFields(String firstName, String lastName, String username, String email, String password, String confirmPassword) {
         if (firstName == null || firstName.isBlank()) {
             throw new RuntimeException("Firstname is required");
         }
@@ -53,22 +125,42 @@ public class UserService {
         if (confirmPassword == null || confirmPassword.isBlank()) {
             throw new RuntimeException("Confirm password is required");
         }
-        // Check if password matches confirmPassword
         if (!password.equals(confirmPassword)) {
             throw new RuntimeException("Password and confirmation password do not match");
         }
-        // Check for existing username or email
-        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Username or Email already exists");
+    }
+
+    private String storeProfileImage(MultipartFile file) throws IOException {
+        // unique filename generated
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
         }
-        // create and save new User
-        User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-        return userRepository.save(user);
+
+        String uniqueFilename = UUID.randomUUID() + String.valueOf(System.currentTimeMillis()) + extension;
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            boolean uploadResult = uploadDir.mkdirs();
+            if (!uploadResult) throw new IOException("Error creating the file directory.");
+        }
+        Path filePath = Paths.get(UPLOAD_DIR, uniqueFilename);
+        Files.write(filePath, file.getBytes(), StandardOpenOption.CREATE_NEW);
+        return "/uploads/" + uniqueFilename;
+    }
+
+    private void deleteOldProfileImage(String imageUrl) {
+        // /uploads/filename.extension - file format processed
+        if (!imageUrl.startsWith("/uploads/")) {
+            return;
+        }
+        String filename = imageUrl.substring("/uploads/".length());
+        Path oldFilePath = Paths.get(UPLOAD_DIR, filename);
+        try {
+            Files.deleteIfExists(oldFilePath);
+        } catch (IOException e) {
+            System.err.println("Failed to delete old profile image: " + oldFilePath.toString() + " - " + e.getMessage());
+        }
     }
 
     public User authenticateByUsername(String username, String password) {
@@ -87,8 +179,9 @@ public class UserService {
         return null;
     }
 
-    public User getUserById(String userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    public User getUserById(String userId) throws RuntimeException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public User getUserByUsername(String username) {
@@ -99,62 +192,27 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public User updateUser(String userId, HashMap<String, Object> updates) {
-        User existingUser = getUserById(userId);
-        // Update fields dynamically from the HashMap
-        updates.forEach((key, value) -> {
-            switch (key) {
-                case "username":
-                    String username = (String) value;
-                    if (!existingUser.getUsername().equals(username) && userRepository.existsByUsername(username)) {
-                        throw new RuntimeException("Username already taken");
-                    }
-                    existingUser.setUsername(username);
-                    break;
-
-                case "email":
-                    String email = (String) value;
-                    if (!existingUser.getEmail().equals(email) && userRepository.existsByEmail(email)) {
-                        throw new RuntimeException("Email already in use");
-                    }
-                    existingUser.setEmail(email);
-                    break;
-
-                case "firstname":
-                    existingUser.setFirstName((String) value);
-                    break;
-
-                case "lastname":
-                    existingUser.setLastName((String) value);
-                    break;
-
-                default:
-                    throw new RuntimeException("Invalid field: " + key);
+    public void deleteUser(String userId) throws RuntimeException {
+        User user = getUserById(userId);
+        if (user != null) {
+            // delete user's profile image if exists
+            String imageUrl = user.getProfileImageUrl();
+            if (imageUrl != null && !imageUrl.isBlank()) {
+                deleteOldProfileImage(imageUrl);
             }
-        });
-        return userRepository.save(existingUser);
-    }
-
-    public void deleteUser(String userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
             userRepository.deleteById(userId);
         } else {
             throw new RuntimeException("User not found");
         }
     }
 
-    // Forgot Password
-    public void initiatePasswordReset(String email) throws IOException {
+    public void initiatePasswordReset(String email) throws RuntimeException {
         User user = getUserByEmail(email);
         if (user == null) {
-            // not revealing that the email does not exist
-            return;
+            throw new RuntimeException("Invalid credentials.");
         }
-        // Create a new password reset token (valid for 15 minutes)
         PasswordResetToken resetToken = new PasswordResetToken(user.getId(), 15);
         passwordResetTokenRepository.save(resetToken);
-        // Send email to user with reset link
         emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
     }
 
@@ -168,36 +226,29 @@ public class UserService {
         }
         PasswordResetToken resetToken = optionalToken.get();
         if (resetToken.isExpired()) {
-            passwordResetTokenRepository.delete(resetToken); // Clean up expired token
+            passwordResetTokenRepository.delete(resetToken);
             throw new RuntimeException("Token has expired");
         }
         User user = getUserById(resetToken.getUserId());
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        // Delete the token after successful password reset
         passwordResetTokenRepository.delete(resetToken);
     }
 
-    // Password reset for authenticated user
-    public void resetPassword(String userId, String currentPassword, String newPassword, String confirmPassword) {
-        if (!isValidPassword(newPassword)) {
-            throw new RuntimeException("Password does not meet requirements");
-        }
-        User user = getUserById(userId);
-        // Validate the current password
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new RuntimeException("Current password is incorrect");
-        }
-        // validate the new password and confirmation match
+    public void resetPassword(@Valid User user, String currentPassword, String newPassword, String confirmPassword) throws RuntimeException {
         if (newPassword == null || newPassword.isBlank()) {
             throw new RuntimeException("New password cannot be empty");
         }
         if (!newPassword.equals(confirmPassword)) {
             throw new RuntimeException("New password and confirmation do not match");
         }
-
+        if (!isValidPassword(newPassword)) {
+            throw new RuntimeException("Password does not meet requirements");
+        }
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
         String hashedPassword = passwordEncoder.encode(newPassword);
-        // update and save the user with the new hashed password
         user.setPassword(hashedPassword);
         userRepository.save(user);
     }

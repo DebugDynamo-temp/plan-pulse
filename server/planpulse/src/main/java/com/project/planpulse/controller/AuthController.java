@@ -1,19 +1,16 @@
 package com.project.planpulse.controller;
 
-import com.project.planpulse.auth.JwtUtil;
+import com.project.planpulse.util.JwtUtil;
 import com.project.planpulse.model.User;
 import com.project.planpulse.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -23,9 +20,17 @@ public class AuthController {
     private UserService userService;
 
     // Signup
-    @PostMapping("/register")
-    public Map<String, String> register(@RequestBody HashMap<String, String> user, HttpServletResponse response) {
-        User registeredUser = userService.registerUser(user);
+    @PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Map<String, String> register(
+            @RequestParam String firstname,
+            @RequestParam String lastname,
+            @RequestParam String username,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            @RequestParam(required = false) MultipartFile profileImage,
+            HttpServletResponse response) throws IOException {
+        User registeredUser = userService.registerUserWithMultipart(firstname, lastname, username, email, password, confirmPassword, profileImage);
         String token = JwtUtil.generateToken(registeredUser.getId());
         addTokenToCookie(response, token);
         return Map.of("token", token, "userId", registeredUser.getId());
@@ -57,10 +62,9 @@ public class AuthController {
         return Map.of("message", "Logged out successfully");
     }
 
-
     // Forgot Password
     @PostMapping("/forgot-password")
-    public Map<String, String> forgotPassword(@RequestBody Map<String, String> request) throws IOException {
+    public Map<String, String> forgotPassword(@RequestBody Map<String, String> request) throws RuntimeException {
         String email = request.get("email");
         if (email == null || email.isBlank()) {
             throw new RuntimeException("Email is required");
