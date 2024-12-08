@@ -44,10 +44,6 @@ dependencies {
     // Redis Client
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // Apache Kafka
-    implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'org.apache.kafka:kafka-clients:3.7.1'
-
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -4,11 +4,13 @@ import com.project.planpulse.model.User;
 import com.project.planpulse.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,15 +24,37 @@ public class UserController {
     // Get user profile
     @GetMapping("/profile")
     public User getUserProfile(Authentication authentication) {
-        String userId = authentication.getName(); // Get user ID from JWT token
+        String userId = authentication.getName(); // user ID from JWT token
         return userService.getUserById(userId);
     }
 
     // Update user profile
-    @PutMapping("/profile")
-    public User updateUserProfile(Authentication authentication, @RequestBody HashMap<String, Object> updates) {
-        String userId = authentication.getName(); // Get user ID from JWT token
-        return userService.updateUser(userId, updates);
+    @PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public User updateUserProfile(
+            Authentication authentication,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String firstname,
+            @RequestParam(required = false) String lastname,
+            @RequestParam(name = "profile_image", required = false) MultipartFile profileImage
+    ) throws IOException {
+        String userId = authentication.getName();
+        return userService.updateUserWithMultipart(userId, username, email, firstname, lastname, profileImage);
+    }
+
+    @PutMapping(value = "/reset-password")
+    public Map<String, String> resetPassword(@RequestBody Map<String, String> request) throws RuntimeException {
+        String email = request.get("email");
+        String currentPassword = request.get("password");
+        String newPassword = request.get("new-password");
+        String confirmPassword = request.get("confirm-password");
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("Email is required");
+        }
+        User user = userService.getUserByEmail(email);
+        if (user == null) throw new RuntimeException("Invalid credentials!");
+        userService.resetPassword(user, currentPassword, newPassword, confirmPassword);
+        return Map.of("message", "Password changed successfully.");
     }
 
     // Delete own account
