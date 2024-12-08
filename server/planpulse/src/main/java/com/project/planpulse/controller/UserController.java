@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -32,11 +31,11 @@ public class UserController {
     @PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public User updateUserProfile(
             Authentication authentication,
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String firstname,
-            @RequestParam(required = false) String lastname,
-            @RequestParam(name = "profile_image", required = false) MultipartFile profileImage
+            @RequestParam(name = "firstname", required = false) String firstname,
+            @RequestParam(name = "lastname", required = false) String lastname,
+            @RequestParam(name = "username", required = false) String username,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "profileImage", required = false) MultipartFile profileImage
     ) throws IOException {
         String userId = authentication.getName();
         return userService.updateUserWithMultipart(userId, username, email, firstname, lastname, profileImage);
@@ -46,8 +45,8 @@ public class UserController {
     public Map<String, String> resetPassword(@RequestBody Map<String, String> request) throws RuntimeException {
         String email = request.get("email");
         String currentPassword = request.get("password");
-        String newPassword = request.get("new-password");
-        String confirmPassword = request.get("confirm-password");
+        String newPassword = request.get("newPassword");
+        String confirmPassword = request.get("confirmPassword");
         if (email == null || email.isBlank()) {
             throw new RuntimeException("Email is required");
         }
