@@ -55,41 +55,6 @@ function UserProfile(){
                             /> 
                         )}
                     />
-                    <Controller
-                        name="pswd"
-                        control={control}
-                        render={({ field: { onChange, value }}) => (
-                            <TextField 
-                                className='textField'
-                                value={value}
-                                onChange={onChange}
-                                type="password"
-                                id='pswd'
-                                label='Current Password'
-                                variant='outlined'
-                                fullWidth
-                            /> 
-                        )}
-                    />
-                    <Controller
-                        name="newPswd"
-                        control={control}
-                        render={({ field: { onChange, value }}) => (
-                            <TextField 
-                                className='textField'
-                                value={value}
-                                onChange={onChange}
-                                type="password"
-                                id='newPswd'
-                                label='New Password'
-                                variant='outlined'
-                                error={errors.pswd ? true : false}
-                                helperText={errors.pswd?.message}
-                                autoComplete='new-password'
-                                fullWidth
-                            /> 
-                        )}
-                    />
                     <footer>
                         <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
                         <Button variant='contained' type='submit'>Update</Button>

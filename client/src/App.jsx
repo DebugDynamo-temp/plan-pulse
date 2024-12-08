@@ -4,12 +4,14 @@ import Dashboard from './pages/Dashboard';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import TaskDetailed from './pages/TaskDetailed';
 import UserProfile from './pages/UserProfile';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
 import { theme } from './components/Theme';
 import Kanban from './components/Kanban';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
           </Route>
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </UserProvider>
     </ThemeProvider>
