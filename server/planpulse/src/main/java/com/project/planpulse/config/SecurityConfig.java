@@ -1,40 +1,40 @@
 package com.project.planpulse.config;
 
-import com.project.planpulse.util.JwtUtil;
+import com.project.planpulse.filter.JwtAuthenticationFilter;
+import com.project.planpulse.filter.RateLimitingFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
-    private OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
+    private RateLimitingFilter rateLimitingFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())  // CSRF token in a cookie
-                )
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**").permitAll()  // Public URLs
-                        .anyRequest().authenticated()  // All other URLs require authentication
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oauth2LoginSuccessHandler)  // Custom success handler for OAuth2
-                        .defaultSuccessUrl("/home", true)  // Redirect to /home after success
-                        .failureUrl("/loginFailure")  // Redirect to /loginFailure after failure
-                );
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers("/auth/**")
+                                .permitAll().anyRequest().authenticated())
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class)
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(
+                        (req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                ));
 
         return http.build();
     }
+
 }

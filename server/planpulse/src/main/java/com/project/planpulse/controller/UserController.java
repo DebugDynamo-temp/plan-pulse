@@ -2,43 +2,52 @@ package com.project.planpulse.controller;
 
 import com.project.planpulse.model.User;
 import com.project.planpulse.service.UserService;
-import com.project.planpulse.util.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        User createdUser = userService.registerUser(user);
-        return ResponseEntity.ok(createdUser);
+    // Get user profile
+    @GetMapping("/profile")
+    public User getUserProfile(Authentication authentication) {
+        String userId = authentication.getName(); // Get user ID from JWT token
+        return userService.getUserById(userId);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        Optional<User> user = userService.findByUsername(username);
-        if (user.isPresent() && userService.checkPassword(password, user.get().getPassword())) {
-            String token = jwtUtil.generateToken(username);
-            return ResponseEntity.ok("Bearer " + token);
-        }
-        return ResponseEntity.status(401).body("Invalid credentials");
+    // Update user profile
+    @PutMapping("/profile")
+    public User updateUserProfile(Authentication authentication, @RequestBody HashMap<String, Object> updates) {
+        String userId = authentication.getName(); // Get user ID from JWT token
+        return userService.updateUser(userId, updates);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        return userService.findByUsername(username)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // Delete own account
+    @DeleteMapping("/profile")
+    public Map<String, String> deleteUserProfile(Authentication authentication, HttpServletResponse response) {
+        String userId = authentication.getName();
+        userService.deleteUser(userId);
+        // Remove JWT cookie as user is deleted
+        removeTokenCookie(response);
+        return Map.of("message", "User account deleted successfully");
+    }
+
+    private void removeTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("JWT-TOKEN", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 }

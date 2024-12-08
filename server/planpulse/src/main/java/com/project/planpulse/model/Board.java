@@ -14,14 +14,11 @@ import java.util.Date;
 public class Board {
     @Id
     private String id;
-
     private String title;
-    private String type = "PRIVATE"; // Enum: PRIVATE, PUBLIC
+    private String type = "PRIVATE"; // PRIVATE or PUBLIC
     private String creatorId;
-
-    private List<String> collaboratorIds;
-    private List<String> taskIds;
-
+    private List<String> collaboratorIds; // Users who can modify tasks
+    private List<String> taskIds; // Tasks in this board
     private Date createdAt = new Date();
     private Date updatedAt = new Date();
 }
