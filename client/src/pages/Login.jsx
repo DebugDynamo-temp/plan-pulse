@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../components/User';
+import { login } from '../services/auth';
 
 function Login() {
     const nav = useNavigate();
@@ -30,6 +31,7 @@ function Login() {
 
     function submit(data){
         //send data to server to sign-in user
+        login(data.email, data.pswd);
         setUser({
             name: 'Jack',
             email: data.email,

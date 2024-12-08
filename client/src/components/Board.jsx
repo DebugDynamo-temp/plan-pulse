@@ -4,6 +4,7 @@ import { status, statusToReadable } from "../services/utils";
 import { useContext, useEffect, useState } from "react";
 import Task from "./Task";
 import TaskContext from "../components/TaskContext";
+import { updateTaskStatus } from "../services/task";
 
 function Board({ board }){
 	const { tasks } = useContext(TaskContext);
@@ -24,6 +25,16 @@ function Board({ board }){
 		newTask.timeSpent = 0;
 		console.log(newTask);
 		setTasks([...displayTasks, newTask]);
+	}
+	
+	function changeStatus(task){
+		setTasks(displayTasks.map((t) => {
+			if(t.id === task.id){
+				return { ...t, status: task.status }
+			}
+
+			return t;
+		}))
 	}
 
 	useEffect(() => {
@@ -51,7 +62,7 @@ function Board({ board }){
 							{displayTasks.filter((t) => {
 								return t.status === s;
 							}).map((t) => {
-								return <Task task={t} key={t.title} />
+								return <Task task={t} key={t.title} onStatusChange={() => { changeStatus(t) }} />
 							})}
 						</div>
 					)

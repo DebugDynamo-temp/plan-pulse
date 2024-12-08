@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import UserContext from "../components/User";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import { getBoards } from "../services/board";
 
 function Dashboard(){
 	const { user, setUser } = useContext(UserContext);
@@ -36,6 +37,17 @@ function Dashboard(){
 		}
 
 		setAuthorized(true);
+
+		async function getBoardsByUser(){
+			const boards = await getBoards(user.id);
+			console.log(boards);
+			setBoards(boards);
+		}
+		getBoardsByUser();		
+
+		return () => {
+
+		}
 	}, [])
 	
 	return (

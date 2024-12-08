@@ -7,11 +7,25 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import parse from 'html-react-parser';
 import { useNavigate } from "react-router-dom";
 
-function Task({ task }){
+function Task({ task, onStatusChange }){
 	const nav = useNavigate();
 
 	function openTask(){
 		nav('/home/task', { state: task });
+	}
+
+	function upgradeStatus(){
+		switch(task.status){
+			case 'TO_DO':
+				task.status = "IN_PROGRESS";
+				break;
+			case 'IN_PROGRESS':
+				task.status = "IN_REVIEW";
+				break;
+			default:
+				task.status = "DONE";
+		}
+		onStatusChange(task);
 	}
 
 	return (
@@ -25,15 +39,20 @@ function Task({ task }){
 				{parse(task.description)} 
 			</AccordionDetails>
 			<AccordionActions>
-				<Button 
-					variant="contained" 
-					color="primary"
-				>Edit</Button>
-				<Button 
-					variant="contained" 
-					color="primary"
-					onClick={openTask}	
-				>Open</Button>
+				{ task.status != "DONE" ? 
+					<>
+						<Button 
+							variant="contained" 
+							color="secondary"
+							onClick={upgradeStatus}
+						>Upgrade Status</Button>
+						<Button 
+							variant="contained" 
+							color="primary"
+							onClick={openTask}	
+						>Open</Button>
+					</>
+				: '' }
 			</AccordionActions>
 		</Accordion>
 	)

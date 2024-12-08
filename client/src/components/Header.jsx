@@ -7,11 +7,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../services/auth";
 
 function Header(){
     const nav = useNavigate();
 	const { user, setUser } = useContext(UserContext);
 	const [anchorEl, setAnchorEl] = useState(null);
+
+    async function signOut(){
+        await logout(user.id);
+        setUser(null);
+        nav('/');
+    }
 
     return (
         <AppBar position="static">
@@ -46,7 +53,7 @@ function Header(){
                     keepMounted
                 >
                     <MenuItem onClick={(e) => nav('/home/user')}>Profile</MenuItem>
-                    <MenuItem onClick={(e) => {setUser(null); nav('/');}}>Logout</MenuItem>
+                    <MenuItem onClick={(e) => signOut}>Logout</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

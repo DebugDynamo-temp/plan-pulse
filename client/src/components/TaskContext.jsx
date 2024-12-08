@@ -12,6 +12,7 @@ const TaskProvider = ({ children }) => {
 				deadline: new Date(),
 				status: "TO_DO",
 				timeSpent: 5000,
+				id: 1
 			},
 			{
 				title: "Two",
@@ -20,6 +21,7 @@ const TaskProvider = ({ children }) => {
 				deadline: new Date(),
 				status: "IN_PROGRESS",
 				timeSpent: 5000,
+				id: 2
 			},
 			{
 				title: "Three",
@@ -28,6 +30,7 @@ const TaskProvider = ({ children }) => {
 				deadline: new Date(),
 				status: "TO_DO",
 				timeSpent: 5000,
+				id: 3
 			},
 			{
 				title: "Four",
@@ -37,6 +40,7 @@ const TaskProvider = ({ children }) => {
 				deadline: new Date(),
 				status: "DONE",
 				timeSpent: 5000,
+				id: 4
 			}
 		],
 	"Group 1": [
@@ -47,6 +51,7 @@ const TaskProvider = ({ children }) => {
 			deadline: new Date(),
 			status: "TO_DO",
 			timeSpent: 5000,
+			id: 5
 		},
 		{
 			title: "Outline",
@@ -56,6 +61,7 @@ const TaskProvider = ({ children }) => {
 			deadline: new Date(),
 			status: "DONE",
 			timeSpent: 5000,
+			id: 6
 		}
 	],
 	"Group 2": [
@@ -66,6 +72,7 @@ const TaskProvider = ({ children }) => {
 			deadline: new Date(),
 			status: "TO_DO",
 			timeSpent: 5000,
+			id: 7
 		},
 		{
 			title: "Create user stories",
@@ -74,6 +81,7 @@ const TaskProvider = ({ children }) => {
 			deadline: new Date(),
 			status: "IN_PROGRESS",
 			timeSpent: 5000,
+			id: 8
 		},
 		{
 			title: "Report",
@@ -82,6 +90,7 @@ const TaskProvider = ({ children }) => {
 			deadline: new Date(),
 			status: "IN_REVIEW",
 			timeSpent: 5000,
+			id: 9
 		},
 	]};
 

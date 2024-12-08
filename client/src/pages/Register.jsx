@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useContext } from 'react';
 import User from '../components/User';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../services/auth';
 
 function Register() {
     const nav = useNavigate();
@@ -33,8 +34,7 @@ function Register() {
 
     function submit(data, e){
         //send data to server to create user, filtering out the confirmPswd
-        delete data.confirmPswd;
-
+        register(data);
         setUser({
             name: 'Jack',
             email: data.email,
