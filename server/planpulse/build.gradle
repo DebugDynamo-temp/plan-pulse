@@ -33,8 +33,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // JWT Support
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -51,10 +49,17 @@ dependencies {
     // Emailing service
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+    // JUnit 5 for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 
+    // Mockito for mocking dependencies
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+
+    // Spring Boot Starter Test for integration with Spring
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    // For mocking Spring Boot-specific beans (e.g., @Autowired)
+    testImplementation 'org.mockito:mockito-inline:5.5.0'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
