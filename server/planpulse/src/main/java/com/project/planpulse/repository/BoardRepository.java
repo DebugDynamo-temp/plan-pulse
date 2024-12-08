@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface BoardRepository extends MongoRepository<Board, String> {
     List<Board> findByCreatorId(String creatorId);
+
+    List<Board> findByCollaboratorIdsContaining(String userId);
 }
