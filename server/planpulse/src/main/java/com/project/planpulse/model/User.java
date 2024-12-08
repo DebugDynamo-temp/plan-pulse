@@ -20,10 +20,10 @@ public class User {
     private String id;
 
     @NotBlank(message = "Firstname is required")
-    private String firstName;
+    private String firstname;
 
     @NotBlank(message = "Lastname is required")
-    private String lastName;
+    private String lastname;
 
     @Indexed(unique = true)
     @NotBlank(message = "Email is required")
