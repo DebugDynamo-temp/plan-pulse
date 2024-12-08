@@ -55,8 +55,8 @@ public class UserService {
         }
 
         User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        user.setFirstname(firstName);
+        user.setLastname(lastName);
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
@@ -86,10 +86,10 @@ public class UserService {
             existingUser.setEmail(email);
         }
         if (firstname != null && !firstname.isBlank()) {
-            existingUser.setFirstName(firstname);
+            existingUser.setFirstname(firstname);
         }
         if (lastname != null && !lastname.isBlank()) {
-            existingUser.setLastName(lastname);
+            existingUser.setLastname(lastname);
         }
         // handle profile image update if new image is provided
         if (profileImage != null && !profileImage.isEmpty()) {
@@ -149,7 +149,7 @@ public class UserService {
             extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
         }
         String uniqueFilename = UUID.randomUUID() + "_" + System.currentTimeMillis() + extension;
-        // Create directory if it does not exist
+        // create directory if it does not exist
         File uploadDir = new File(UPLOAD_DIR);
         if (!uploadDir.exists()) {
             boolean uploadResult = uploadDir.mkdirs();
