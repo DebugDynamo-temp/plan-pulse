@@ -128,6 +128,9 @@ public class UserService {
         if (!password.equals(confirmPassword)) {
             throw new RuntimeException("Password and confirmation password do not match");
         }
+        if (!isValidPassword(password)) {
+            throw new RuntimeException("Password does not meet requirements");
+        }
     }
 
     private String storeProfileImage(MultipartFile file) throws IOException, RuntimeException {
