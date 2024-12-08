@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CustomSnackbar from '../components/Snackbar';
+import { forgotPassword } from '../services/auth';
 import Typography from '@mui/material/Typography';
 
 function ForgotPassword(){
@@ -29,9 +30,12 @@ function ForgotPassword(){
         }
     });
 
-    function submit(data, e){
-
-        setOpenSnackbar(true);
+    async function submit(data){
+        let res = await forgotPassword(data.email); 
+        if(res.success){
+            nav('/login');
+            setOpenSnackbar(true);
+        }
     }
 
     function closeSnackbar(){
