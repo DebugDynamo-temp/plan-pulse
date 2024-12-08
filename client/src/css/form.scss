@@ -24,6 +24,18 @@
             }
         }
 
+        span {
+            display: block;
+            margin-top: 10px;
+            color: #f50057;
+            text-decoration: underline;
+
+            &:hover {
+                color: #ab003c !important;
+                cursor: pointer;
+            }
+        }
+
         footer {
             margin-top: 15px;
             display: flex;

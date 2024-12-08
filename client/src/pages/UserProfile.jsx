@@ -1,15 +1,18 @@
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../components/User';
-import { Typography } from '@mui/material';
+import CustomSnackbar from '../components/Snackbar';
+import Typography from '@mui/material/Typography';
 
 function UserProfile(){
     const nav = useNavigate();
     const { user, setUser } = useContext(UserContext);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMsg, setSnackbarMsg] = useState('Email changed!');
 
     const { 
         control, 
@@ -24,20 +27,30 @@ function UserProfile(){
         mode: 'onChange',
         defaultValues: {
             email: user.email,
-            pswd: '',
-            newPswd: '',
         }
     });
 
     function submit(data, e){
-        console.log(data);
+        setSnackbarMsg('Email changed!');
+        setOpenSnackbar(true);
+    }
+
+    function resetPassword(){
+        //call to server to email link
+        setSnackbarMsg('Password reset email sent.');
+        setOpenSnackbar(true);
+    }
+
+    function closeSnackbar(){
+        setOpenSnackbar(false);
+        console.log("closing");
     }
 
     return (
         <section>
             <form className="profile" onSubmit={handleSubmit(submit)}>
                 <Paper id="paper">
-                    <Typography variant="h2">{user.name}</Typography>
+                    <Typography variant="h3">{user.name}</Typography>
                     <Controller
                         name="email"
                         control={control}
@@ -55,12 +68,14 @@ function UserProfile(){
                             /> 
                         )}
                     />
+                    <span onClick={resetPassword}>Forgot Password?</span>
                     <footer>
                         <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
-                        <Button variant='contained' type='submit'>Update</Button>
+                        <Button variant='contained' type='submit'>Update Email</Button>
                     </footer>
                 </Paper> 
             </form>
+            <CustomSnackbar open={openSnackbar} close={closeSnackbar} msg={snackbarMsg} />
         </section>
     )
 }
