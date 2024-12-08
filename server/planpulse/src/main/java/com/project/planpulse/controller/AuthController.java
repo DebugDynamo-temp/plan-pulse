@@ -79,8 +79,12 @@ public class AuthController {
     public Map<String, String> resetPassword(@RequestBody Map<String, String> request) {
         String token = request.get("token");
         String newPassword = request.get("newPassword");
-        if (token == null || token.isBlank() || newPassword == null || newPassword.isBlank()) {
-            throw new RuntimeException("Token and new password are required");
+        String confirmPassword = request.get("confirmPassword");
+        if (token == null || token.isBlank() || newPassword == null || newPassword.isBlank() || confirmPassword == null || confirmPassword.isBlank()) {
+            throw new RuntimeException("Token, new password, and confirm password are required");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            throw new RuntimeException("Confirm password and the new password must be the same");
         }
         userService.resetPasswordWithToken(token, newPassword);
         return Map.of("message", "Password has been reset successfully");

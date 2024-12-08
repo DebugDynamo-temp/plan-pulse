@@ -14,7 +14,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: planpulse.no.reply@gmail.com
-    password: ${PLANPULSE_EMAIL_GOOGLE_APP_PASSWORD}
+    password: oppb vloc nytm kszd
     properties:
       mail:
         smtp:
@@ -32,7 +32,7 @@ logging:
     com.project.planpulse: DEBUG
 
 app:
-  reset-password-url: https://planpulse.com/reset-password?token= # frontend URL for password reset link
+  reset-password-url: http://localhost:5001/reset-password?token= # frontend URL for password reset link
   frontend-url: https://planpulse.com
 
 security:

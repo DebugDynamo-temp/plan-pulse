@@ -128,6 +128,9 @@ public class UserService {
         if (!password.equals(confirmPassword)) {
             throw new RuntimeException("Password and confirmation password do not match");
         }
+        if (!isValidPassword(password)) {
+            throw new RuntimeException("Password does not meet requirements");
+        }
     }
 
     private String storeProfileImage(MultipartFile file) throws IOException, RuntimeException {
@@ -143,12 +146,14 @@ public class UserService {
         if (originalFilename == null || !hasValidImageExtension(originalFilename)) {
             throw new RuntimeException("Invalid file extension. Supported formats are: .jpg, .jpeg, .png, .gif.");
         }
-        // unique filename generated
-        String extension = "";
-        if (originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+        // validate file content (magic number check)
+        if (!isValidImageMagicNumber(file)) {
+            throw new RuntimeException("Uploaded file is not a valid image.");
         }
+        // unique filename generation below
+        String extension = originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf('.')) : "";
         String uniqueFilename = UUID.randomUUID() + "_" + System.currentTimeMillis() + extension;
+
         // create directory if it does not exist
         File uploadDir = new File(UPLOAD_DIR);
         if (!uploadDir.exists()) {
@@ -181,6 +186,39 @@ public class UserService {
                 lowerCaseFilename.endsWith(".bmp");
     }
 
+    private boolean isValidImageMagicNumber(MultipartFile file) throws IOException {
+        byte[] headerBytes = new byte[8];
+        try (var inputStream = file.getInputStream()) {
+            if (inputStream.read(headerBytes) < 8) {
+                return false; // File too small to be valid
+            }
+        }
+
+        // JPEG: FF D8 FF
+        if (headerBytes[0] == (byte) 0xFF && headerBytes[1] == (byte) 0xD8 && headerBytes[2] == (byte) 0xFF) {
+            return true;
+        }
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if (headerBytes[0] == (byte) 0x89 && headerBytes[1] == (byte) 0x50 &&
+                headerBytes[2] == (byte) 0x4E && headerBytes[3] == (byte) 0x47 &&
+                headerBytes[4] == (byte) 0x0D && headerBytes[5] == (byte) 0x0A &&
+                headerBytes[6] == (byte) 0x1A && headerBytes[7] == (byte) 0x0A) {
+            return true;
+        }
+        // GIF: 47 49 46 38
+        if (headerBytes[0] == (byte) 0x47 && headerBytes[1] == (byte) 0x49 &&
+                headerBytes[2] == (byte) 0x46 && headerBytes[3] == (byte) 0x38) {
+            return true;
+        }
+        // BMP: 42 4D
+        if (headerBytes[0] == (byte) 0x42 && headerBytes[1] == (byte) 0x4D) {
+            return true;
+        }
+
+        // Unsupported file type
+        return false;
+    }
+
     private void deleteOldProfileImage(String imageUrl) {
         // /uploads/filename.extension - file format processed
         if (!imageUrl.startsWith("/uploads/")) {
@@ -192,7 +230,7 @@ public class UserService {
             Files.deleteIfExists(oldFilePath);
             System.out.println("Deleted old profile image: " + oldFilePath.toAbsolutePath());
         } catch (IOException e) {
-            System.err.println("Failed to delete old profile image: " + oldFilePath.toString() + " - " + e.getMessage());
+            System.err.println("Failed to delete old profile image: " + oldFilePath + " - " + e.getMessage());
         }
     }
 
