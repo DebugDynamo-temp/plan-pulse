@@ -17,20 +17,24 @@ async function login(email, pswd){
 
 async function register(first, last, email, uname, pswd, confirmPswd){
     let formData = new FormData();
+    let result = {};
     formData.append('firstname', first)
     formData.append('lastname', last)
     formData.append('email', email)
     formData.append('username', uname);
     formData.append('confirmPassword', pswd)
     formData.append('password', confirmPswd)
-    formData.append('profile_image', '');
+    formData.append('profileImage', '');
 
-    let response = await fetch('http://localhost:8080/auth/register', {
+    fetch('http://localhost:8080/auth/register', {
         method: "POST",
         body: formData 
+    }).then((data) => data.json())
+    .then((data) => {
+        console.log(data);
+    }).catch((e) => {
+        console.log(e);
     })
-
-    response = await response.json();
 }
 
 async function logout(token){

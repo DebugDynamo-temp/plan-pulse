@@ -24,14 +24,13 @@ function Login() {
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            email: '',
+            identifier: '',
             pswd: '',
         }
     });
 
     function submit(data){
-        //send data to server to sign-in user
-        login(data.email, data.pswd);
+        login(data.identifier, data.pswd);
         setUser({
             name: 'Jack',
             email: data.email,
@@ -45,16 +44,16 @@ function Login() {
             <Paper id="paper">
                 <h1>Sign In:</h1>
                 <Controller
-                    name="email"
+                    name="identifier"
                     control={control}
-                    rules={{ required: 'Email is required' }}
+                    rules={{ required: 'Email or Username is required' }}
                     render={({ field: { onChange, value }}) => (
                         <TextField 
                             className='textField' 
                             value={value}
                             onChange={onChange}
-                            id='email' 
-                            label='Email' 
+                            id='identifier' 
+                            label='Email/Username' 
                             variant='outlined' 
                             error={errors.email ? true : false} 
                             helperText={errors.email?.message}
