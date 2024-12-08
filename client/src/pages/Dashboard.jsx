@@ -3,6 +3,7 @@ import UserContext from "../components/User";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { getBoards } from "../services/board";
+import { getUser } from "../services/user";
 
 function Dashboard(){
 	const { user, setUser } = useContext(UserContext);
@@ -31,23 +32,12 @@ function Dashboard(){
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
 	useEffect(() => {
-		if(user.name.length < 1 || user.email.length < 1 || user.id.length < 1){
-			setAuthorized(false);
-			return;
+		async function user(){
+			let user = await getUser();
+			console.log(user);
 		}
 
-		setAuthorized(true);
-
-		async function getBoardsByUser(){
-			const boards = await getBoards(user.id);
-			console.log(boards);
-			setBoards(boards);
-		}
-		//getBoardsByUser();		
-
-		return () => {
-
-		}
+		user();
 	}, [])
 	
 	return (

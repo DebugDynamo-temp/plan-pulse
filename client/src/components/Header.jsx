@@ -15,9 +15,13 @@ function Header(){
 	const [anchorEl, setAnchorEl] = useState(null);
 
     async function signOut(){
-        await logout(user.id);
+        let res = await logout();
         setUser(null);
-        nav('/');
+        if(res.success){
+            nav('/');
+        } else {
+            alert('Error logging out');
+        }
     }
 
     return (
@@ -27,7 +31,7 @@ function Header(){
                     PlanPulse	
                 </Typography>
                 <Typography variant="h6" component="div">
-                    { user.email }
+                    { "Placeholder" }
                 </Typography>
                 <IconButton
                     onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -53,7 +57,7 @@ function Header(){
                     keepMounted
                 >
                     <MenuItem onClick={(e) => nav('/home/user')}>Profile</MenuItem>
-                    <MenuItem onClick={(e) => signOut}>Logout</MenuItem>
+                    <MenuItem onClick={(e) => signOut()}>Logout</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

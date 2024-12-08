@@ -5,7 +5,7 @@ const headers = new Headers({
 async function getBoards(userID){
     let response = await fetch(`http://localhost:8080/boards/creator/${userID}`, {
         method: 'GET',
-        headers: headers
+        headers: headers,
     })
 
     console.log(response);

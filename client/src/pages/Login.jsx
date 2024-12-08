@@ -29,14 +29,13 @@ function Login() {
         }
     });
 
-    function submit(data){
-        login(data.identifier, data.pswd);
-        setUser({
-            name: 'Jack',
-            email: data.email,
-            id: 0
-        }) 
-        nav('/home');
+    async function submit(data){
+        let res = await login(data.identifier, data.pswd);
+        if(res.success){
+            nav('/home');
+        } else {
+            alert('Login failed');
+        }
     }
 
     return ( 
@@ -57,6 +56,7 @@ function Login() {
                             variant='outlined' 
                             error={errors.email ? true : false} 
                             helperText={errors.email?.message}
+                            autoComplete='username'
                             fullWidth required 
                         /> 
                     )}
@@ -78,6 +78,7 @@ function Login() {
                             variant='outlined'
                             error={errors.pswd ? true : false}
                             helperText={errors.pswd?.message}
+                            autoComplete='current-password'
                             fullWidth required
                         /> 
                     )}

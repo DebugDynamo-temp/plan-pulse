@@ -31,17 +31,16 @@ function Register() {
         }
     });
     const pswd = watch('pswd', '');
-    const { setUser } = useContext(User);
+    const { user, setUser } = useContext(User);
 
-    function submit(data, e){
-        //send data to server to create user, filtering out the confirmPswd
-        register(data.first, data.last, data.email, data.uname, data.pswd, data.confirmPswd);
-        setUser({
-            name: 'Jack',
-            email: data.email,
-            id: 0
-        }) 
-        nav('/home');
+    async function submit(data, e){
+        let res = await register(data.fname, data.lname, data.email, data.uname, data.pswd, data.confirmPswd);
+        if(res.success){
+            setUser(res.user.userId);
+            nav('/login');
+        } else {
+            alert('Registration failed');
+        }
     }
 
     return ( 
@@ -132,8 +131,10 @@ function Register() {
                     name="pswd"
                     control={control}
                     rules={{ 
-                        required: "Password is required and must be 8 characters long",
-                        minLength: 8
+                        pattern: {
+                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                            message: "Password must contain 8 characters, including one lower and uppercase letter, one number, and one special character"
+                        }
                     }}
                     render={({ field: { onChange, value }}) => (
                         <TextField 

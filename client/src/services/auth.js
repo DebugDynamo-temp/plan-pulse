@@ -1,23 +1,42 @@
-const headers = new Headers({
+import Cookies from 'js-cookie';
+
+const jsonContentType = new Headers({
     'Content-Type': 'application/json'
 })
 
-async function login(email, pswd){
-    let response = await fetch('http://localhost:8080/auth/login', {
-        method: "POST",
-        body: JSON.stringify({
-            identifier: email,
-            password: pswd 
-        }),
-        headers: headers
-    })
+async function login(identifier, pswd){
 
-    console.log(response);
+    try {
+        let response = await fetch('http://localhost:8080/auth/login', {
+            method: "POST",
+            body: JSON.stringify({
+                identifier: identifier,
+                password: pswd 
+            }),
+            headers: jsonContentType 
+        })
+
+        if(response.status >= 400 && response.status < 500){
+            throw new Exception("Authentication error");
+        } else if(response.status < 600 && response.status >= 500){
+            throw new Exception("Server error");
+        }
+
+        response = await response.json();
+        Cookies.set('token', response.token);
+        return { 
+            success: true,
+        }
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 async function register(first, last, email, uname, pswd, confirmPswd){
     let formData = new FormData();
-    let result = {};
     formData.append('firstname', first)
     formData.append('lastname', last)
     formData.append('email', email)
@@ -26,25 +45,55 @@ async function register(first, last, email, uname, pswd, confirmPswd){
     formData.append('password', confirmPswd)
     formData.append('profileImage', '');
 
-    fetch('http://localhost:8080/auth/register', {
-        method: "POST",
-        body: formData 
-    }).then((data) => data.json())
-    .then((data) => {
-        console.log(data);
-    }).catch((e) => {
-        console.log(e);
-    })
+    try {
+        let response = await fetch('http://localhost:8080/auth/register', {
+            method: "POST",
+            body: formData 
+        })
+
+        if(response.status >= 400 && response.status < 500){
+            throw new Exception("Authentication error");
+        } else if(response.status < 600 && response.status >= 500){
+            throw new Exception("Server error");
+        }
+
+        response = await response.json();
+
+        Cookies.set('token', response.token, { expires: 1 });
+        return {
+            success: true,
+            user: response
+        }
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    } 
 }
 
-async function logout(token){
-    let response = await fetch('http://localhsot:8080/auth/logout', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(token)
-    })
+async function logout(){
+    try {
+        let response = await fetch('http://localhost:8080/auth/logout', {
+            method: 'POST',
+            headers: new Headers({
+                'Set-Cookie': `JWT-TOKEN=${Cookies.get('token')}`
+            }),
+        }) 
 
-    console.log(response);
+        response = await response.json();
+        Cookies.remove('token');
+
+        return {
+            success: true
+        }
+
+    } catch(e) {
+        return {
+            err: e,
+            success: false
+        }
+    }
 }
 
 export {
