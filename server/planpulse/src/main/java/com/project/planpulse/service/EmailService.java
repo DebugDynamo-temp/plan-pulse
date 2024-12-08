@@ -19,7 +19,7 @@ public class EmailService {
     private String sendGridApiKey;
 
     @Value("${app.reset-password-url}")
-    private String resetPasswordUrl; // https://frontend.com/reset-password?token=
+    private String resetPasswordUrl; // https://frontend.com/reset-password?token=.....
 
     public void sendPasswordResetEmail(String toEmail, String token) throws IOException {
         Email from = new Email("no-reply@planpulse.com");

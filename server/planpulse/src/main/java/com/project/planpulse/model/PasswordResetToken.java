@@ -28,7 +28,7 @@ public class PasswordResetToken {
     public PasswordResetToken(String userId, long ttlMinutes) {
         this.userId = userId;
         this.token = UUID.randomUUID().toString();
-        this.expiresAt = new Date(System.currentTimeMillis() + ttlMinutes * 60000);
+        this.expiresAt = new Date(System.currentTimeMillis() + ttlMinutes * 15000); // 15 mins
     }
 
     public boolean isExpired() {

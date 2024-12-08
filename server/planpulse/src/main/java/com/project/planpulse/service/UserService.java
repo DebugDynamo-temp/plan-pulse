@@ -148,8 +148,8 @@ public class UserService {
             // not revealing that the email does not exist
             return;
         }
-        // Create a new password reset token (valid for 60 minutes)
-        PasswordResetToken resetToken = new PasswordResetToken(user.getId(), 60);
+        // Create a new password reset token (valid for 15 minutes)
+        PasswordResetToken resetToken = new PasswordResetToken(user.getId(), 15);
         passwordResetTokenRepository.save(resetToken);
         // Send email to user with reset link
         emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
