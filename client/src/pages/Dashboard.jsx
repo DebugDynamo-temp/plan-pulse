@@ -3,7 +3,7 @@ import UserContext from "../components/User";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
-function Dashboard({}){
+function Dashboard(){
 	const { user, setUser } = useContext(UserContext);
 	const [authorized, setAuthorized] = useState(false);
 	const nav = useNavigate();

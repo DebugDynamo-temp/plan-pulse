@@ -10,5 +10,10 @@ export default defineConfig({
         api: 'modern-compiler'
       }
     }
+  },
+  test: {
+    setupFiles: './tests/setup.js',
+    globals: true,
+    environment: 'jsdom'
   }
 })

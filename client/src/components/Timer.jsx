@@ -28,7 +28,7 @@ function Timer({ timeSpent=0 }){
         <div>
             <span>{days}</span>:<span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
             <footer>
-                <Button variant='contained' onClick={toggleTimer}>{ isRunning ? "Stop Timer" : "Start Timer" }</Button>
+                <Button role='button' data-testid='timer-toggle' variant='contained' onClick={toggleTimer}>{ isRunning ? "Stop Timer" : "Start Timer" }</Button>
             </footer>
         </div>
     )

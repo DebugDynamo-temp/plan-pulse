@@ -35,6 +35,7 @@ function Board({ board }){
 			<header>
 				<h1>{board.title}</h1>
 				<Button
+					data-testid="create-task"
 					variant="contained"
 					color="secondary"
 					onClick={(e) => setOpenCreateTask((prev) => !prev)}
@@ -56,7 +57,7 @@ function Board({ board }){
 					)
 				})}
 			</div>
-			<CreateTaskDialog open={openCreateTask} close={setClosed} addTask={addTask}/>
+			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setClosed} addTask={addTask}/>
 		</>	
 	)
 }

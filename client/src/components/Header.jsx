@@ -27,6 +27,7 @@ function Header(){
                     size="large"
                     edge="end"
                     color="inherit"
+                    data-testid="icon-button"
                 >
                     <AccountCircle />
                 </IconButton>
