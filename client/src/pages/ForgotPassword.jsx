@@ -30,6 +30,7 @@ function ForgotPassword(){
     });
 
     function submit(data, e){
+
         setOpenSnackbar(true);
     }
 

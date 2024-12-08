@@ -3,32 +3,86 @@ const headers = new Headers({
 })
 
 async function getBoards(userID){
-    let response = await fetch(`http://localhost:8080/boards/creator/${userID}`, {
-        method: 'GET',
-        headers: headers,
-    })
+    try {
+        let response = await fetch(`http://localhost:8080/boards/creator/${userID}`, {
+            method: 'GET',
+            headers: headers,
+        })
 
-    console.log(response);
+        if(response.status >= 400 && response.status < 500){
+            throw new Exception("Authentication error");
+        } else if(response.status < 600 && response.status >= 500){
+            throw new Exception("Server error");
+        }
+
+        response = await response.json();
+
+        console.log(response);
+        return {
+            success: true,
+            boards: response
+        }
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 async function getBoardByID(boardID){
-    let response = await fetch(`http://localhost:8080/boards/${boardID}`, {
-        method: 'GET',
-        headers: headers
-    })
+    try {
+        let response = await fetch(`http://localhost:8080/boards/${boardID}`, {
+            method: 'GET',
+            headers: headers,
+        })
 
-    console.log(response);
+        if(response.status >= 400 && response.status < 500){
+            throw new Exception("Authentication error");
+        } else if(response.status < 600 && response.status >= 500){
+            throw new Exception("Server error");
+        }
+
+        response = await response.json();
+
+        console.log(response);
+        return {
+            success: true,
+            board: response
+        }
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 async function addCollaborator(boardID, userID){
-    let response = await fetch(`http://localhost:8080/boards/${boardID}/collaborators`, {
-        method: 'POST',
-        headers: headers,
-        body: userID
-    })
+    try {
+        let response = await fetch(`http://localhost:8080/boards/${boardID}/collaborators`, {
+            method: 'POST',
+            body: userID
+        })
 
-    console.log(response);
+        if(response.status >= 400 && response.status < 500){
+            throw new Exception("Authentication error");
+        } else if(response.status < 600 && response.status >= 500){
+            throw new Exception("Server error");
+        }
 
+        response = await response.json();
+
+        console.log(response);
+        return {
+            success: true,
+        }
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 export {

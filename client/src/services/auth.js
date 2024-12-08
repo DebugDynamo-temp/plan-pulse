@@ -76,9 +76,32 @@ async function logout(){
     try {
         let response = await fetch('http://localhost:8080/auth/logout', {
             method: 'POST',
-            headers: new Headers({
-                'Set-Cookie': `JWT-TOKEN=${Cookies.get('token')}`
+            credentials: 'include'
+        }) 
+
+        response = await response.json();
+        Cookies.remove('JWT-TOKEN');
+
+        return {
+            success: true
+        }
+
+    } catch(e) {
+        return {
+            err: e,
+            success: false
+        }
+    }
+}
+
+async function forgotPassword(email){
+    try {
+        let response = await fetch('http://localhost:8080/auth/logout', {
+            method: 'POST',
+            body: JSON.stringify({
+                email: email
             }),
+            headers: jsonContentType
         }) 
 
         response = await response.json();
@@ -97,6 +120,7 @@ async function logout(){
 }
 
 export {
+    forgotPassword,
     login,
     logout,
     register
