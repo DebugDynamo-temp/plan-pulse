@@ -39,5 +39,8 @@ public class User {
     @ValidPassword
     private String password;
 
+    // only the profile-img URL stored in the user document
+    private String profileImageUrl;
+
     private List<String> boardIds;
 }

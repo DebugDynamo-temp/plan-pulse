@@ -1,4 +1,4 @@
-package com.project.planpulse.auth;
+package com.project.planpulse.util;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

@@ -1,6 +1,6 @@
 package com.project.planpulse.filter;
 
-import com.project.planpulse.auth.JwtUtil;
+import com.project.planpulse.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
