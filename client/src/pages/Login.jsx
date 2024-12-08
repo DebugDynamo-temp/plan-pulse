@@ -34,7 +34,7 @@ function Login() {
             email: data.email,
             id: 0
         }) 
-        nav('/dashboard');
+        nav('/home');
     }
 
     return ( 

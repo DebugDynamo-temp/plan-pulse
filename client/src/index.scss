@@ -75,6 +75,37 @@ html, body {
                     height: 70%;
                 }
             }
+
+            &.taskDetailed {
+                display: grid;
+                padding: 10px;
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+                gap: 10px 10px;
+
+                #desc {
+                    grid-row: span 2;
+                    grid-column: span 3;
+                    display: flex;
+                }
+
+                #deadline {
+                    grid-row: span 1;
+                    grid-column: span 1;
+                }
+
+                #status {
+                    grid-row: span 1;
+                    grid-column: span 1;
+                }
+
+                @each $p in $priorities {
+                    $i: index($priorities, $p);
+                    .p-#{$i} {
+                        background-color: $p;
+                    }
+                }
+            }
         }
     }
 }

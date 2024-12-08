@@ -4,8 +4,10 @@ import TextField from '@mui/material/TextField';
 import { useForm, Controller } from 'react-hook-form';
 import { useContext } from 'react';
 import User from '../components/User';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+    const nav = useNavigate();
     const { 
         control, 
         handleSubmit, 
@@ -38,7 +40,7 @@ function Register() {
             email: data.email,
             id: 0
         }) 
-        nav('/dashboard');
+        nav('/home');
     }
 
     return ( 
@@ -101,6 +103,7 @@ function Register() {
                             variant='outlined' 
                             error={errors.email ? true : false} 
                             helperText={errors.email?.message}
+                            autoComplete='new-password'
                             fullWidth required 
                         /> 
                     )}
@@ -123,6 +126,7 @@ function Register() {
                             variant='outlined'
                             error={errors.pswd ? true : false}
                             helperText={errors.pswd?.message}
+                            autoComplete='new-password'
                             fullWidth required
                         /> 
                     )}

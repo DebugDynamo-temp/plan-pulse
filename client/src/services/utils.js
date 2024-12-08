@@ -22,7 +22,19 @@ function readableToStatus(str){
 	return obj[str];
 }
 
+function getDayOfWeek(day){
+	const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	return days[day];
+}
+
+function getMonth(month){
+	const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+	return months[month];
+}
+
 export {
+	getDayOfWeek,
+	getMonth,
 	readableToStatus,
 	status,
 	statusToReadable

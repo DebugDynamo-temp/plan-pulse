@@ -8,7 +8,7 @@ const TaskProvider = ({ children }) => {
 			{
 				title: "One",
 				description: "This is task 1",
-				priority: 10,
+				priority: 1,
 				deadline: new Date(),
 				status: "TO_DO",
 				timeSpent: 5000,

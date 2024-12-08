@@ -21,7 +21,7 @@
     "react-hook-form": "^7.53.0",
     "react-quilljs": "^2.0.4",
     "react-router-dom": "^6.26.2",
-    "react-use-precision-timer": "^3.5.5"
+    "react-timer-hook": "^3.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
