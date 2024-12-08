@@ -23,7 +23,7 @@ async function login(identifier, pswd){
         }
 
         response = await response.json();
-        Cookies.set('token', response.token);
+        Cookies.set('JWT-TOKEN', response.token);
         return { 
             success: true,
         }
@@ -82,7 +82,7 @@ async function logout(){
         }) 
 
         response = await response.json();
-        Cookies.remove('token');
+        Cookies.remove('JWT-TOKEN');
 
         return {
             success: true

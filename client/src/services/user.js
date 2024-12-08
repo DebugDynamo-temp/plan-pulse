@@ -1,7 +1,9 @@
 import Cookies from 'js-cookie';
 
+const headers = new Headers();
+
 async function getUser(){
-    if(!Cookies.get('token')){
+    if(!Cookies.get('JWT-TOKEN')){
         return {
             success: false,
             msg: 'No Token'
@@ -11,9 +13,10 @@ async function getUser(){
     try {
         let response = await fetch('http://localhost:8080/users/profile', {
             method: "GET",
+            credentials: 'include',
             headers: new Headers({
-                'Set-Cookie': `JWT-TOKEN=${Cookies.get('token')}`
-            }),
+                'Content-Type': 'application/json'
+            })
         })
 
         if(response.status >= 400 && response.status < 500){
@@ -23,6 +26,7 @@ async function getUser(){
         }
 
         response = await response.json();
+        console.log(response);
     } catch(e) {
         return {
             success: false,

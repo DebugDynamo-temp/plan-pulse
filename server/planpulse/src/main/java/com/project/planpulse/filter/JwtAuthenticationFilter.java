@@ -1,5 +1,6 @@
 package com.project.planpulse.filter;
 
+import java.lang.*;
 import com.project.planpulse.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,8 +21,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = extractTokenFromCookies(request.getCookies());
+    	System.out.println(token);
         if (token != null) {
             String userId = JwtUtil.validateToken(token);
+            System.out.println("userId="+userId);
             if (userId != null) {
                 Authentication auth = new UsernamePasswordAuthenticationToken(userId, null, null);
                 SecurityContextHolder.getContext().setAuthentication(auth);
@@ -34,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (cookies == null) return null;
         for (Cookie cookie : cookies) {
             if ("JWT-TOKEN".equals(cookie.getName())) {
+            	System.out.println(cookie.getName()+"="+cookie.getValue());
                 return cookie.getValue();
             }
         }

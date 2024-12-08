@@ -131,6 +131,7 @@ function Register() {
                     name="pswd"
                     control={control}
                     rules={{ 
+                        maxLength: 30,
                         pattern: {
                             value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                             message: "Password must contain 8 characters, including one lower and uppercase letter, one number, and one special character"
