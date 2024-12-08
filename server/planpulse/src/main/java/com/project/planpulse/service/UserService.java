@@ -227,7 +227,7 @@ public class UserService {
             Files.deleteIfExists(oldFilePath);
             System.out.println("Deleted old profile image: " + oldFilePath.toAbsolutePath());
         } catch (IOException e) {
-            System.err.println("Failed to delete old profile image: " + oldFilePath.toString() + " - " + e.getMessage());
+            System.err.println("Failed to delete old profile image: " + oldFilePath + " - " + e.getMessage());
         }
     }
 
