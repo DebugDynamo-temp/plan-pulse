@@ -1,6 +1,5 @@
 package com.project.planpulse.service;
 
-import com.project.planpulse.model.Board;
 import com.project.planpulse.model.PasswordResetToken;
 import com.project.planpulse.model.User;
 import com.project.planpulse.repository.PasswordResetTokenRepository;
@@ -18,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,6 +62,7 @@ public class UserService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setProfileImageUrl(profileImageUrl);
+        user.setBoardIds(new ArrayList<>());
         return userRepository.save(user);
     }
 
