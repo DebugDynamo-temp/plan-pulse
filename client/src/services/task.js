@@ -2,9 +2,9 @@ const headers = new Headers({
     'Content-type': 'application/json'
 })
 
-async function createTask(task){
+async function createTask(task, boardID){
     try {
-        let result = await fetch('http://localhost:8080/tasks', {
+        let result = await fetch(`http://localhost:8080/boards/add-task/${boardID}`, {
             method: 'POST',
             credentials: 'include',
             headers: headers,

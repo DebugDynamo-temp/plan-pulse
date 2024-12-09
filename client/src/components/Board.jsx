@@ -41,7 +41,7 @@ function Board({ board }){
 			newTask.assignee = user.id;
 		}
 
-		let res = await createTask(newTask);
+		let res = await createTask(newTask, board.id);
 		if(res.success){
 			setTasks([...displayTasks, newTask]);
 		} else {
