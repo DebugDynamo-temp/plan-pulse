@@ -60,7 +60,7 @@ async function getBoardByID(boardID){
 }
 async function createBoard(board){
     try {
-        let response = await fetch(`http://localhost:8080/boards`, {
+        let response = await fetch(`http://localhost:8080/boards/create-board`, {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify(board),
