@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import Board from "../src/components/Board";
-import { TaskProvider } from "../src/components/TaskContext";
 import { BrowserRouter } from "react-router-dom";
 import { expect } from "vitest";
+import { UserProvider } from "../src/contexts/User";
 
 describe('Should display tasks assigned to that board sorted by status', () => {
     const boardProp = {
@@ -13,9 +13,9 @@ describe('Should display tasks assigned to that board sorted by status', () => {
     }
     const { container, queryByTestId } = render(
         <BrowserRouter>
-            <TaskProvider>
+            <UserProvider>
                 <Board board={boardProp} />
-            </TaskProvider>
+            </UserProvider>
         </BrowserRouter>
     );
     const button = queryByTestId('create-task');

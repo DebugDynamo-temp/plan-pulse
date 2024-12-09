@@ -1,6 +1,6 @@
 import { render, fireEvent, screen, queryByRole } from "@testing-library/react";
 import Header from "../src/components/Header";
-import { UserProvider } from "../src/components/User";
+import { UserProvider } from "../src/contexts/User";
 import { BrowserRouter } from "react-router-dom";
 import { expect } from "vitest";
 

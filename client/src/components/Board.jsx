@@ -66,7 +66,6 @@ function Board({ board }){
 			<header>
 				<h1>{board.title}</h1>
 				<Button
-					data-testid="create-task"
 					variant="contained"
 					color="secondary"
 					onClick={(e) => setOpenCollaborator((prev) => !prev)}
