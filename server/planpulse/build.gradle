@@ -59,10 +59,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     
     // For mocking Spring Boot-specific beans (e.g., @Autowired)
-    //testImplementation 'org.mockito:mockito-inline:5.5.0'
+    testImplementation 'org.mockito:mockito-inline:5.5.0'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 }
 
 tasks.named('test') {
