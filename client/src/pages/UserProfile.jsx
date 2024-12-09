@@ -1,15 +1,15 @@
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
+import { updateUser } from '../services/user';
 import { useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import UserContext from '../contexts/User';
 import CustomSnackbar from '../components/Snackbar';
 import Typography from '@mui/material/Typography';
 
+
 function UserProfile(){
-    const nav = useNavigate();
     const { user, setUser } = useContext(UserContext);
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
@@ -18,18 +18,19 @@ function UserProfile(){
         handleSubmit, 
         formState: { 
             errors,
-            isDirty,
-            isValid
         },
-        reset
+        reset 
     } = useForm({
         mode: 'onChange',
         defaultValues: {
             email: user.email,
+            img: ''
         }
     });
 
-    function submit(data, e){
+    async function submit(data, e){
+        console.log(data);
+        let res = await updateUser(data);
         setOpenSnackbar(true);
     }
 
@@ -46,7 +47,6 @@ function UserProfile(){
                         name="email"
                         control={control}
                         rules={{ 
-                            required: 'Email is required',
                             pattern: {
                                 value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                                 message: 'Please enter a valid email'
@@ -63,6 +63,19 @@ function UserProfile(){
                                 error={errors.email ? true : false} 
                                 helperText={errors.email?.message}
                                 fullWidth 
+                            /> 
+                        )}
+                    />
+                    <Controller
+                        name="img"
+                        control={control}
+                        render={({ field: { onChange, value }}) => (
+                            <input 
+                                type='file' 
+                                value={value}
+                                onChange={onChange}
+                                id='img' 
+                                accept='img/png img/jpeg img/pjg' 
                             /> 
                         )}
                     />

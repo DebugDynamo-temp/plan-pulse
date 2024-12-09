@@ -5,14 +5,28 @@ import UserContext from "../contexts/User";
 import { useContext, useEffect, useState } from "react";
 import Task from "./Task";
 import { createTask, getTasksByBoard } from "../services/task";
+import CollaboratorDialog from "./CollaboratorDialog";
+import { addCollaborator } from "../services/board";
 
 function Board({ board }){
 	const { user } = useContext(UserContext);
 	const [openCreateTask, setOpenCreateTask] = useState(false);
+	const [openCollaborator, setOpenCollaborator] = useState(false);
 	const [displayTasks, setTasks] = useState([]);
 
 	function setTaskClosed(){
 		setOpenCreateTask(false);
+	}
+
+	function setCollaboratorClosed(){
+		setOpenCollaborator(false);
+	}
+
+	async function addCollab(identifier){
+		let res = await addCollaborator(identifier);
+		if(!res.success){
+			alert("Failed to add collaborator");
+		}
 	}
 
 	async function addTask(newTask){
@@ -55,6 +69,14 @@ function Board({ board }){
 					data-testid="create-task"
 					variant="contained"
 					color="secondary"
+					onClick={(e) => setOpenCollaborator((prev) => !prev)}
+				>
+					Add Collaborator 
+				</Button>
+				<Button
+					data-testid="create-task"
+					variant="contained"
+					color="secondary"
 					onClick={(e) => setOpenCreateTask((prev) => !prev)}
 				>
 					Add Task
@@ -75,6 +97,7 @@ function Board({ board }){
 				})}
 			</div>
 			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} />
+			<CollaboratorDialog open={openCollaborator} close={setCollaboratorClosed} addCollaborator={addCollab} />
 		</>	
 	)
 }

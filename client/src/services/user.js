@@ -1,7 +1,5 @@
 import Cookies from 'js-cookie';
 
-const headers = new Headers();
-
 async function getUser(){
     if(!Cookies.get('JWT-TOKEN')){
         return {
@@ -40,6 +38,44 @@ async function getUser(){
     }
 }
 
+async function updateUser(data){
+    let formData = new FormData();
+    
+    if(data.email){
+        formData.append('email', data.email);
+    }
+
+    if(data.img){
+        formData.append('profileImage', data.img);
+    }
+
+    try {
+        let response = await fetch('http://localhost:8080/users/profile', {
+            method: "PUT",
+            credentials: 'include',
+            body: formData 
+        })
+
+        if(response.status >= 400 && response.status < 500){
+            throw "Authentication error";
+        } else if(response.status < 600 && response.status >= 500){
+            throw "Server error";
+        }
+
+        response = await response.json();
+        console.log(response);
+        return {
+            success: true,
+        } 
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
+}
+
 export {
-    getUser
+    getUser,
+    updateUser
 }
