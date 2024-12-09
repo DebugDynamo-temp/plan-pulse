@@ -35,9 +35,11 @@ function Board({ board }){
 		newTask.endTime = new Date();
 		newTask.startTime = new Date();
 		newTask.reporterId = user.id;
-		newTask.assigneeId = 0;
 		newTask.timeSpent = 0;
-		console.log(newTask);
+		if(board.type === 'PRIVATE'){
+			newTask.assignee = user.id;
+		}
+
 		let res = await createTask(newTask);
 		if(res.success){
 			setTasks([...displayTasks, newTask]);
@@ -95,7 +97,7 @@ function Board({ board }){
 					)
 				})}
 			</div>
-			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} />
+			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} collaborators={board.collaborators} showCollaborators={board.type === 'PUBLIC'} />
 			<CollaboratorDialog open={openCollaborator} close={setCollaboratorClosed} addCollaborator={addCollab} />
 		</>	
 	)
