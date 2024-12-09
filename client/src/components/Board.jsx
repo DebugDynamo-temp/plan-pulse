@@ -23,7 +23,8 @@ function Board({ board }){
 	}
 
 	async function addCollab(identifier){
-		let res = await addCollaborator(identifier);
+		let res = await addCollaborator(board.id, identifier);
+		console.log(res);
 		if(!res.success){
 			alert("Failed to add collaborator");
 		}

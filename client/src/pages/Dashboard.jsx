@@ -36,7 +36,7 @@ function Dashboard(){
 				uname: user.uname
 			})
 
-			let res = await getBoards(user.id);
+			let res = await getBoards();
 			if(res.success){
 				setBoards(res.boards);
 				setCurrentBoard(res.boards[0]);
