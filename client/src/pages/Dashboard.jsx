@@ -16,6 +16,8 @@ function Dashboard(){
 
 	async function addBoard(newBoard){
 		newBoard.creatorId = user.id;
+		newBoard.collaboratorIds.push(user.id);
+		newBoard.type = newBoard.type.toUpperCase();
 		let res = await createBoard(newBoard);
 		if(res.success){
 			setBoards([...boards, res.board]);

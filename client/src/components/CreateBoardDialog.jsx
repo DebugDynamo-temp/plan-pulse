@@ -28,6 +28,7 @@ function CreateBoardDialog({ open, close, addBoard }){
 	function handleSubmit(){
 		setIsOpen(false);
 		close();
+		newBoard.type = newBoard.type.toUpperCase();
 		addBoard(newBoard);
 		setNewBoard(init);
 	}
@@ -61,7 +62,7 @@ function CreateBoardDialog({ open, close, addBoard }){
 						type="text"
 						value={newBoard.title}
 						variant="outlined"
-						onChange={(e) => setNewBoard({...newBoard, title: e.target.value})}
+						onChange={(e) => setNewBoard({...newBoard, title: e.target.value })}
 						onFocus={(e) => e.target.select()}
 						fullWidth
 						autoFocus
@@ -74,7 +75,7 @@ function CreateBoardDialog({ open, close, addBoard }){
 						<Select 
 							value={newBoard.type}
 							id="status-select"
-							onChange={(e) => setNewBoard({...newBoard, type: e.target.value})}
+							onChange={(e) => setNewBoard({...newBoard, type: e.target.value })}
 						>
 							<MenuItem value="PRIVATE">Private</MenuItem>
 							<MenuItem value="Public">Public</MenuItem>

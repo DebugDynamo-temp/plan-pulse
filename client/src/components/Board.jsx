@@ -67,13 +67,14 @@ function Board({ board }){
 		<>
 			<header>
 				<h1>{board.title}</h1>
+				{ board.type === 'PUBLIC' ?
 				<Button
 					variant="contained"
 					color="secondary"
 					onClick={(e) => setOpenCollaborator((prev) => !prev)}
 				>
 					Add Collaborator 
-				</Button>
+				</Button>: ''}
 				<Button
 					data-testid="create-task"
 					variant="contained"
@@ -97,7 +98,7 @@ function Board({ board }){
 					)
 				})}
 			</div>
-			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} collaborators={board.collaborators} showCollaborators={board.type === 'PUBLIC'} />
+			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} collaborators={board.collaboratorIds} showCollaborators={board.type === 'PUBLIC'} />
 			<CollaboratorDialog open={openCollaborator} close={setCollaboratorClosed} addCollaborator={addCollab} />
 		</>	
 	)

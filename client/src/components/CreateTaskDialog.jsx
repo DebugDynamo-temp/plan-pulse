@@ -112,15 +112,17 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 					showCollaborators ? 
 					<div>
 						<h4>Assign To:</h4>
-						<select onChange={setNewTask({...newTask, assignee: c})}>
-							{
-								collaborators.map((c, idx) => {
-									return (
-										<option value={c} key={`c-${idx}`}>{c}</option>
-									)
-								})	
-							}
-						</select>
+						<FormControl fullWidth>
+							<Select 
+								value={newTask.assignee}
+								id="assignee-select"
+								onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
+							>
+								{collaborators.map((c, idx) => {
+									return <MenuItem key={`c-${idx}`} value={c}>{c}</MenuItem>
+								})}
+							</Select>
+						</FormControl>
 					</div> : ''
 				}
 			</DialogContent>
