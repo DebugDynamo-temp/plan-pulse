@@ -57,13 +57,12 @@ public class UserServiceTest {
         mockUser.setEmail(email);
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
 
-        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 userService.registerUserWithMultipart(firstName, lastName, username, email, password, confirmPassword, mockFile)
         );
 
         assertEquals("Invalid file type. Only image files are allowed.", exception.getMessage());
-        verify(userRepository, never()).save(any(User.class)); // Ensure save is never called
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
