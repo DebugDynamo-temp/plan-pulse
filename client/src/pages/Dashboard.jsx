@@ -31,6 +31,17 @@ function Dashboard(){
 	])
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
+	function addBoard(newBoard){
+		newBoard.creatorId = 0;
+		setBoards([...boards, newBoard]);
+		setTasks({...tasks, [newBoard.title]: []});
+		setCurrentBoard(newBoard.title);
+	}
+
+	/*useEffect(() => {
+		if(user.name.length < 1 || user.email.length < 1 || user.id.length < 1){
+			setAuthorized(false);
+			return;
 	useEffect(() => {
 		async function user(){
 			let user = await getUser();

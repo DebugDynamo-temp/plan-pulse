@@ -8,7 +8,6 @@ import { updateTaskStatus } from "../services/task";
 
 function Board({ board }){
 	const { tasks } = useContext(TaskContext);
-	const [statusCollection, setStatus] = useState(status);
 	const [openCreateTask, setOpenCreateTask] = useState(false);
 	const [displayTasks, setTasks] = useState(tasks[board.title]);
 
@@ -62,7 +61,7 @@ function Board({ board }){
 							{displayTasks.filter((t) => {
 								return t.status === s;
 							}).map((t) => {
-								return <Task task={t} key={t.title} onStatusChange={() => { changeStatus(t) }} />
+								return <TaskSummary task={t} key={t.title} onStatusChange={() => { changeStatus(t) }} />
 							})}
 						</div>
 					)

@@ -1,4 +1,4 @@
-import { UserProvider } from './components/User';
+import { UserProvider } from './contexts/User';
 import './index.scss';
 import Dashboard from './pages/Dashboard';
 import Landing from './pages/Landing';
