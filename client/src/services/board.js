@@ -89,10 +89,11 @@ async function createBoard(board){
 
 async function addCollaborator(boardID, identifier){
     try {
-        let response = await fetch(`http://localhost:8080/boards/add-user/${boardID}`, {
+        let response = await fetch(`http://localhost:8080/boards/add-user/${boardID}/${identifier}`, {
             method: 'POST',
-            body: JSON.stringify(identifier),
             credentials: 'include',
+            body: '',
+            headers: headers
         })
 
         if(response.status >= 400 && response.status < 500){
@@ -100,8 +101,6 @@ async function addCollaborator(boardID, identifier){
         } else if(response.status < 600 && response.status >= 500){
             throw "Server error";
         }
-
-        response = await response.json();
 
         return {
             success: true,
