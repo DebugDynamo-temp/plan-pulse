@@ -9,7 +9,7 @@ import TaskDetailed from './pages/TaskDetailed';
 import UserProfile from './pages/UserProfile';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
-import { theme } from './components/Theme';
+import { theme } from './contexts/Theme';
 import Kanban from './components/Kanban';
 import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/ForgotPassword';
@@ -22,7 +22,7 @@ function App() {
           <Route path='/' element={<Landing />} />
           <Route path='/home' element={<Dashboard />}>
             <Route index element={<Kanban />} />
-            <Route path='task' element={<TaskDetailed />} />
+            <Route path='task/:id' element={<TaskDetailed />} />
             <Route path='user' element={<UserProfile />} />
           </Route>
           <Route path='/register' element={<Register />} />

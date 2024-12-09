@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import UserContext from '../components/User';
+import UserContext from '../contexts/User';
 import { login } from '../services/auth';
 
 function Login() {

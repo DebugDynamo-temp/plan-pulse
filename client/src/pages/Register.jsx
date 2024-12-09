@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useForm, Controller } from 'react-hook-form';
 import { useContext } from 'react';
-import User from '../components/User';
+import User from '../contexts/User';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../services/auth';
 

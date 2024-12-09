@@ -5,27 +5,35 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import parse from 'html-react-parser';
+import { updateTaskStatus } from "../services/task";
 import { useNavigate } from "react-router-dom";
 
-function Task({ task, onStatusChange }){
+function Task({ task, idx, onStatusChange }){
 	const nav = useNavigate();
 
 	function openTask(){
-		nav('/home/task', { state: task });
+		nav(`/home/task/${task.id}`);
 	}
 
-	function upgradeStatus(){
+	async function upgradeStatus(){
+		let newStatus = "";
 		switch(task.status){
 			case 'TO_DO':
-				task.status = "IN_PROGRESS";
+				newStatus = "IN_PROGRESS";
 				break;
 			case 'IN_PROGRESS':
-				task.status = "IN_REVIEW";
+				newStatus = "IN_REVIEW";
 				break;
 			default:
-				task.status = "DONE";
+				newStatus = "DONE";
 		}
-		onStatusChange(task);
+		let res = await updateTaskStatus(task.id, newStatus);
+		if(res.success){
+			task.status = newStatus;
+			onStatusChange(task, idx);
+		} else {
+			alert("Error updating status");
+		}
 	}
 
 	return (

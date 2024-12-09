@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useForm, Controller } from 'react-hook-form';
 import { useContext, useEffect } from 'react';
-import User from '../components/User';
+import User from '../contexts/User';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function ResetPassword(){

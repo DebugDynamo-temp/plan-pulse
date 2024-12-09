@@ -1,60 +1,51 @@
 import { useContext, useEffect, useState } from "react";
-import UserContext from "../components/User";
+import UserContext from "../contexts/User";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { getBoards } from "../services/board";
+import { createBoard, getBoards } from "../services/board";
 import { getUser } from "../services/user";
+import CreateBoardDialog from "../components/CreateBoardDialog";
 
 function Dashboard(){
 	const { user, setUser } = useContext(UserContext);
 	const [authorized, setAuthorized] = useState(false);
+	const [openCreateBoard, setOpenCreateBoard] = useState(false);
 	const nav = useNavigate();
-	const [boards, setBoards] = useState([
-		{
-			title: "Main", 
-			type: "PRIVATE",
-			creatorId: "0",
-			collaboratorIds: [],
-		},
-		{
-			title: "Group 1", 
-			type: "PUBLIC",
-			creatorId: "0",
-			collaboratorIds: [1, 2, 3],
-		},
-		{
-			title: "Group 2", 
-			type: "PUBLIC",
-			creatorId: "0",
-			collaboratorIds: [1, 2, 3],
-		}
-	])
+	const [boards, setBoards] = useState([]);
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
-	function addBoard(newBoard){
-		newBoard.creatorId = 0;
-		setBoards([...boards, newBoard]);
-		setTasks({...tasks, [newBoard.title]: []});
-		setCurrentBoard(newBoard.title);
+	async function addBoard(newBoard){
+		newBoard.creatorId = user.id;
+		let res = await createBoard(newBoard);
+		if(res.success){
+			setBoards([...boards, res.board]);
+			setCurrentBoard(res.board);
+		} else {
+			alert("Error creating Board");
+		}
 	}
 
-	/*useEffect(() => {
-		if(user.name.length < 1 || user.email.length < 1 || user.id.length < 1){
-			setAuthorized(false);
-			return;
 	useEffect(() => {
-		async function user(){
+		async function loadUser(){
 			let user = await getUser();
 			setUser({
 				id: user.id,
 				email: user.email,
 				uname: user.uname
 			})
+
+			let res = await getBoards(user.id);
+			if(res.success){
+				setBoards(res.boards);
+				setCurrentBoard(res.boards[0]);
+			} else {
+				alert("Error loading boards");
+			}
 		}
 
-		user();
-	}, [])
-	
+		loadUser();
+	}, []);
+
 	return (
 		<>
 			<Header />
@@ -72,9 +63,10 @@ function Dashboard(){
 							>{ b.title }</p>
 						)
 					})}
-					<p>+</p>
+					<p onClick={() => {setOpenCreateBoard(true)}}>+</p>
 				</aside>
 				<Outlet context={currentBoard} />
+				<CreateBoardDialog open={openCreateBoard} close={() => setOpenCreateBoard(false)} addBoard={addBoard}/>
 			</main> 
 		</>
 	)

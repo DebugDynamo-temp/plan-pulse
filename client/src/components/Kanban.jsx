@@ -1,5 +1,5 @@
 import Board from "../components/Board";
-import { TaskProvider } from "../components/TaskContext";
+import { TaskProvider } from "../contexts/TaskContext";
 import { useOutletContext } from "react-router-dom";
 
 function Kanban(){
@@ -9,7 +9,7 @@ function Kanban(){
         <>
             <section>
                 <TaskProvider>
-                    <Board board={currentBoard} />
+                    <Board board={currentBoard ? currentBoard : { title: '' }} />
                 </TaskProvider>
             </section>
         </>

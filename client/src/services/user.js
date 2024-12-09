@@ -20,9 +20,9 @@ async function getUser(){
         })
 
         if(response.status >= 400 && response.status < 500){
-            throw new Exception("Authentication error");
+            throw "Authentication error";
         } else if(response.status < 600 && response.status >= 500){
-            throw new Exception("Server error");
+            throw "Server error";
         }
 
         response = await response.json();

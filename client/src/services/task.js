@@ -3,46 +3,147 @@ const headers = new Headers({
 })
 
 async function createTask(task){
-    let result = await fetch('http://localhost:8080/tasks', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(task)
-    })
+    try {
+        let result = await fetch('http://localhost:8080/tasks', {
+            method: 'POST',
+            credentials: 'include',
+            headers: headers,
+            body: JSON.stringify(task)
+        })
 
-    return result;
+        if(result.status >= 400 && result.status < 500){
+            throw "Authentication error";
+        } else if(result.status < 600 && result.status >= 500){
+            throw "Server error";
+        }
+
+        result = await result.json();
+        return {
+            success: true,
+            result: result
+        }
+    } catch(e){
+        return {
+            success: false,
+            err: e
+        }
+    }
+}
+
+async function getTaskById(taskID){
+    try {
+        let result = await fetch(`http://localhost:8080/tasks/${taskID}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: headers,
+        })
+
+        if(result.status >= 400 && result.status < 500){
+            throw "Authentication error";
+        } else if(result.status < 600 && result.status >= 500){
+            throw "Server error";
+        }
+
+        result = await result.json();
+        console.log(result);
+        return {
+            success: true,
+            task: result
+        };
+
+    } catch(e){
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 async function getTasksByBoard(boardID){
-    let result = await fetch(`http://localhost:8080/tasks/board/${boardID}`, {
-        method: 'GET',
-        headers: headers,
-    })
+    try {
+        let result = await fetch(`http://localhost:8080/tasks/board/${boardID}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: headers,
+        })
 
-    return result;
+        if(result.status >= 400 && result.status < 500){
+            throw "Authentication error";
+        } else if(result.status < 600 && result.status >= 500){
+            throw "Server error";
+        }
+
+        result = await result.json();
+        return {
+            success: true,
+            tasks: result
+        };
+
+    } catch(e){
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 async function updateTaskTime(taskID, time){
-    let result = await fetch(`http://localhost:8080/tasks/${taskID}/time`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(time)
-    })
+    try {
+        let result = await fetch(`http://localhost:8080/tasks/${taskID}/time`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: headers,
+            body: time 
+        })
 
-    return result;
+        if(result.status >= 400 && result.status < 500){
+            throw "Authentication error";
+        } else if(result.status < 600 && result.status >= 500){
+            throw "Server error";
+        }
+
+        return {
+            success: true,
+        }
+
+    } catch(e){
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 async function updateTaskStatus(taskID, status){
-    let result = await fetch(`http://localhost:8080/tasks/${taskID}/status`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(status)
-    })
+    try {
+        let result = await fetch(`http://localhost:8080/tasks/${taskID}/status`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: headers,
+            body: status
+        })
 
-    return result;
+        if(result.status >= 400 && result.status < 500){
+            throw "Authentication error";
+        } else if(result.status < 600 && result.status >= 500){
+            throw "Server error";
+        }
+
+        return {
+            success: true,
+        }
+
+    } catch(e){
+        return {
+            success: false,
+            err: e
+        }
+    }
 }
 
 export {
     createTask,
+    getTaskById,
     getTasksByBoard,
     updateTaskTime,
     updateTaskStatus

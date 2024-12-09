@@ -1,10 +1,9 @@
 import { Button } from '@mui/material';
 import '../index.scss';
 import { useStopwatch } from 'react-timer-hook';
+import { updateTaskTime } from '../services/task';
 
-function Timer({ timeSpent=0 }){
-	const offset = new Date();
-	offset.setSeconds(offset.getSeconds() + timeSpent);
+function Timer({ taskId, updateTimeSpent }){
 	const {
 		totalSeconds,
 		seconds,
@@ -13,20 +12,33 @@ function Timer({ timeSpent=0 }){
 		days,
 		isRunning,
 		start,
-		pause
-	} = useStopwatch({ offsetTimestamp: offset });
+        pause,
+        reset,
+	} = useStopwatch();
 
-    function toggleTimer(){
+    async function toggleTimer(){
         if(isRunning){
             pause();
+            let res = await updateTaskTime(taskId, Math.floor(totalSeconds / 60));
+            if(!res.success){
+                alert("Error updating time");
+            } else {
+                updateTimeSpent(Math.floor(totalSeconds / 60));
+            }
         } else {
+            reset();
             start();
         }
     }
 
     return (
-        <div>
-            <span>{days}</span>:<span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
+        <div id="timer">
+            <div>
+                <span>{days}:</span>
+                <span>{hours}:</span>
+                <span>{minutes}:</span>
+                <span>{seconds}</span>
+            </div>
             <footer>
                 <Button role='button' data-testid='timer-toggle' variant='contained' onClick={toggleTimer}>{ isRunning ? "Stop Timer" : "Start Timer" }</Button>
             </footer>

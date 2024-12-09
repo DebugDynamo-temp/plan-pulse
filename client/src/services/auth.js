@@ -17,9 +17,9 @@ async function login(identifier, pswd){
         })
 
         if(response.status >= 400 && response.status < 500){
-            throw new Exception("Authentication error");
+            throw new Error("Authentication error");
         } else if(response.status < 600 && response.status >= 500){
-            throw new Exception("Server error");
+            throw new Error("Server error");
         }
 
         response = await response.json();
@@ -52,9 +52,9 @@ async function register(first, last, email, uname, pswd, confirmPswd){
         })
 
         if(response.status >= 400 && response.status < 500){
-            throw new Exception("Authentication error");
+            throw new Error("Authentication error");
         } else if(response.status < 600 && response.status >= 500){
-            throw new Exception("Server error");
+            throw new Error("Server error");
         }
 
         response = await response.json();

@@ -25,6 +25,13 @@ function CreateBoardDialog({ open, close, addBoard }){
 		close();
 	}
 
+	function handleSubmit(){
+		setIsOpen(false);
+		close();
+		addBoard(newBoard);
+		setNewBoard(init);
+	}
+
 	useEffect(() => {
 		setIsOpen(open);
 	}, [open]);
@@ -67,7 +74,7 @@ function CreateBoardDialog({ open, close, addBoard }){
 						<Select 
 							value={newBoard.type}
 							id="status-select"
-							onChange={(e) => setNewTask({...newTask, status: e.target.value})}
+							onChange={(e) => setNewBoard({...newBoard, type: e.target.value})}
 						>
 							<MenuItem value="PRIVATE">Private</MenuItem>
 							<MenuItem value="Public">Public</MenuItem>
@@ -78,7 +85,7 @@ function CreateBoardDialog({ open, close, addBoard }){
 			</DialogContent>
 			<DialogActions sx={{ justifyContent: 'space-between', paddingLeft: 4, paddingRight: 4 }}>
 				<Button onClick={(e) => handleClose()} variant="contained" color="secondary">Cancel</Button>
-				<Button type="submit" variant="contained">Create Board</Button>
+				<Button type="submit" variant="contained" onClick={(e) => handleSubmit}>Create Board</Button>
 			</DialogActions>
 		</Dialog>
 	)

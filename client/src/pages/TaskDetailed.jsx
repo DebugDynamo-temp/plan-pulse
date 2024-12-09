@@ -1,24 +1,56 @@
-import Button from "@mui/material/Button";
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent';
-import Header from "../components/Header";
 import parse from 'html-react-parser';
 import { getDayOfWeek, getMonth, statusToReadable } from "../services/utils";
+import Slider from '@mui/material/Slider';
 import Timer from "../components/Timer";
 import Typography from "@mui/material/Typography";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { pink } from "@mui/material/colors";
+import { getTaskById } from '../services/task';
 
 function TaskDetailed(){
-	const nav = useNavigate();
-	const task = useLocation().state;
+	const params = useParams();
+	const [task, setTask] = useState({
+		deadline: new Date(2000, 0, 1),
+		description: '<p>Task not found</p>',
+		title: 'Task not found',
+		priority: 1,
+		timeSpent: 0
+	});
+	const marks = [
+		{
+			value: 0,
+			label: 'To Do',
+		},
+		{
+			value: 1,
+			label: 'In Progress',
+		},
+		{
+			value: 2,
+			label: 'In Review',
+		},
+		{
+			value: 3,
+			label: 'Done',
+		},
+	]
+
+	function updateTimeSpent(timeSpent){
+		setTask({...task, timeSpent: timeSpent + task.timeSpent })		
+	}
 
 	useEffect(() => {
-		if(!task){
-			nav('/dashboard');
+		async function loadTask(){
+			let res = await getTaskById(params.id);
+			console.log(res.task.deadline, new Date(res.task.deadline));
+			setTask({...res.task, deadline: new Date(res.task.deadline)});
 		}
-	}, [task]);	
+
+		loadTask();
+	}, []);	
 
 	return (
 		<section className="taskDetailed">
@@ -42,25 +74,34 @@ function TaskDetailed(){
 					<Typography variant='h4'>
 						{getMonth(task.deadline.getMonth()) + " "}
 						{task.deadline.getDate()}
-					</Typography>	
+					</Typography>
 				</CardContent>
 			</Card>
 
-			<Card variant="elevation" id="status" className={`p-${task.priority}`}>
+			<Card variant="elevation" sx={{ padding: '10px' }} id="status" className={`p-${task.priority}`}>
 				<CardContent>
-					<h4>Status</h4>
-					<p>{statusToReadable(task.status)}</p>
+					<Typography variant='h3'>
+						Status	
+					</Typography>
+					<Slider
+						marks={marks}
+						min={0}
+						max={3}
+						sx={{ pointerEvents: "none" }}
+						value={["TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE"].indexOf(task.status)}
+					/>
+					<p>Assigned To: {task.assigneeId}</p>
 				</CardContent>
 			</Card>
 
 			<Card variant="elevation" id="deadline" sx={{ bgcolor: pink['50'] }}>
 				<CardContent>
-					<h4>Total Time Spent</h4>
-					{task.timeSpent}
+					<Typography variant='h4'>Total Minutes Spent</Typography>
+					<Typography variant='h2'>{task.timeSpent}</Typography>
 				</CardContent>
 			</Card>
 
-			<Timer timeSpent={task.timeSpent} />
+			<Timer timeSpent={task.timeSpent} taskId={task.id} updateTimeSpent={updateTimeSpent} />
 		</section>
 	)
 }

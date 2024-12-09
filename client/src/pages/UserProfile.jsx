@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 import { useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import UserContext from '../components/User';
+import UserContext from '../contexts/User';
 import CustomSnackbar from '../components/Snackbar';
 import Typography from '@mui/material/Typography';
 
