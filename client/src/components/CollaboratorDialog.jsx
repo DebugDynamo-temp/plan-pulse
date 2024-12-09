@@ -59,7 +59,7 @@ function CollaboratorDialog({ open, close, addCollaborator }){
 			</DialogContent>
 			<DialogActions sx={{ justifyContent: 'space-between', paddingLeft: 4, paddingRight: 4 }}>
 				<Button onClick={(e) => handleClose()} variant="contained" color="secondary">Cancel</Button>
-				<Button type="submit" variant="contained" onClick={(e) => handleSubmit}>Add Collaborator</Button>
+				<Button type="submit" variant="contained" onClick={(e) => handleSubmit()}>Add Collaborator</Button>
 			</DialogActions>
 		</Dialog>
 	)

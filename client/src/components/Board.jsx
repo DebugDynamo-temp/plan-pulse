@@ -23,7 +23,8 @@ function Board({ board }){
 	}
 
 	async function addCollab(identifier){
-		let res = await addCollaborator(identifier);
+		let res = await addCollaborator(board.id, identifier);
+		console.log(res);
 		if(!res.success){
 			alert("Failed to add collaborator");
 		}
@@ -35,9 +36,11 @@ function Board({ board }){
 		newTask.endTime = new Date();
 		newTask.startTime = new Date();
 		newTask.reporterId = user.id;
-		newTask.assigneeId = 0;
 		newTask.timeSpent = 0;
-		console.log(newTask);
+		if(board.type === 'PRIVATE'){
+			newTask.assignee = user.id;
+		}
+
 		let res = await createTask(newTask);
 		if(res.success){
 			setTasks([...displayTasks, newTask]);
@@ -65,13 +68,14 @@ function Board({ board }){
 		<>
 			<header>
 				<h1>{board.title}</h1>
+				{ board.type === 'PUBLIC' ?
 				<Button
 					variant="contained"
 					color="secondary"
 					onClick={(e) => setOpenCollaborator((prev) => !prev)}
 				>
 					Add Collaborator 
-				</Button>
+				</Button>: ''}
 				<Button
 					data-testid="create-task"
 					variant="contained"
@@ -95,7 +99,7 @@ function Board({ board }){
 					)
 				})}
 			</div>
-			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} />
+			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} collaborators={board.collaboratorIds} showCollaborators={board.type === 'PUBLIC'} />
 			<CollaboratorDialog open={openCollaborator} close={setCollaboratorClosed} addCollaborator={addCollab} />
 		</>	
 	)

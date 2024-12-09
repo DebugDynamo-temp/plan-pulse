@@ -37,7 +37,7 @@ function Register() {
         let res = await register(data.fname, data.lname, data.email, data.uname, data.pswd, data.confirmPswd);
         if(res.success){
             setUser(res.user.userId);
-            nav('/login');
+            nav('/home');
         } else {
             alert('Registration failed');
         }

@@ -2,9 +2,9 @@ const headers = new Headers({
     'Content-type': 'application/json'
 })
 
-async function getBoards(userID){
+async function getBoards(){
     try {
-        let response = await fetch(`http://localhost:8080/boards/creator/${userID}`, {
+        let response = await fetch('http://localhost:8080/boards/all', {
             method: 'GET',
             headers: headers,
             credentials: 'include'
@@ -89,9 +89,11 @@ async function createBoard(board){
 
 async function addCollaborator(boardID, identifier){
     try {
-        let response = await fetch(`http://localhost:8080/boards/${boardID}/collaborators`, {
+        let response = await fetch(`http://localhost:8080/boards/add-user/${boardID}/${identifier}`, {
             method: 'POST',
-            body: identifier 
+            credentials: 'include',
+            body: '',
+            headers: headers
         })
 
         if(response.status >= 400 && response.status < 500){
@@ -99,8 +101,6 @@ async function addCollaborator(boardID, identifier){
         } else if(response.status < 600 && response.status >= 500){
             throw "Server error";
         }
-
-        response = await response.json();
 
         return {
             success: true,

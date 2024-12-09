@@ -16,6 +16,8 @@ function Dashboard(){
 
 	async function addBoard(newBoard){
 		newBoard.creatorId = user.id;
+		newBoard.collaboratorIds.push(user.id);
+		newBoard.type = newBoard.type.toUpperCase();
 		let res = await createBoard(newBoard);
 		if(res.success){
 			setBoards([...boards, res.board]);
@@ -34,7 +36,7 @@ function Dashboard(){
 				uname: user.uname
 			})
 
-			let res = await getBoards(user.id);
+			let res = await getBoards();
 			if(res.success){
 				setBoards(res.boards);
 				setCurrentBoard(res.boards[0]);

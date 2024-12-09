@@ -5,7 +5,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Editor from "./Editor";
 import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Slider from "@mui/material/Slider";
@@ -13,7 +12,7 @@ import { status, statusToReadable } from "../services/utils";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
 
-function CreateTaskDialog({ open, close, addTask }){
+function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborators }){
 	const init = {
 		title: 'New Task',
 		description: '',
@@ -108,6 +107,24 @@ function CreateTaskDialog({ open, close, addTask }){
 						onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
 					/>
 				</div>
+
+				{
+					showCollaborators ? 
+					<div>
+						<h4>Assign To:</h4>
+						<FormControl fullWidth>
+							<Select 
+								value={newTask.assignee}
+								id="assignee-select"
+								onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
+							>
+								{collaborators.map((c, idx) => {
+									return <MenuItem key={`c-${idx}`} value={c}>{c}</MenuItem>
+								})}
+							</Select>
+						</FormControl>
+					</div> : ''
+				}
 			</DialogContent>
 			<DialogActions sx={{ justifyContent: 'space-between', paddingLeft: 4, paddingRight: 4 }}>
 				<Button onClick={(e) => handleClose()} variant="contained" color="secondary">Cancel</Button>
