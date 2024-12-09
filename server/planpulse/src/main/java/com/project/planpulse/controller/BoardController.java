@@ -33,9 +33,10 @@ public class BoardController {
         return boardService.getBoardById(id);
     }
 
-    @PostMapping("/add-user/{boardId}")
-    public Board giveAccessToUser(@PathVariable String boardId, @RequestBody String identifier, Authentication authentication) {
+    @PostMapping("/add-user/{boardId}/{identifier}")
+    public Board giveAccessToUser(@PathVariable String boardId, @PathVariable String identifier, Authentication authentication) {
         String requesterId = authentication.getName();
+        System.out.println(requesterId);
         return boardService.addCollaborator(requesterId, boardId, identifier);
     }
 

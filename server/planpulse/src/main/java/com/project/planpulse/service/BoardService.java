@@ -54,13 +54,11 @@ public class BoardService {
         validateAddPermission(board, requesterId);
         User user;
         if (isEmail(identifier)) {
-            user = userRepository.findByEmail(identifier).orElse(null);
+            user = userRepository.findByEmail(identifier)
+                    .orElseThrow(() -> new RuntimeException("Invalid user credentials"));
         } else {
-            user = userRepository.findByUsername(identifier).orElse(null);
-        }
-
-        if (user == null) {
-            throw new RuntimeException("Invalid user credentials.");
+            user = userRepository.findByUsername(identifier)
+                    .orElseThrow(() -> new RuntimeException("Invalid user credentials"));
         }
 
         if (!board.getCollaboratorIds().contains(user.getId())) {
