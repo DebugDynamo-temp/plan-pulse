@@ -48,7 +48,9 @@ function CreateTaskDialog({ open, close, addTask }){
 					addTask(newTask);
 					handleClose();
 				}
-			}}	
+			}}
+			maxWidth="md"
+			fullWidth
 		>
 			<DialogTitle>{ newTask.title }</DialogTitle>	
 			<DialogContent className="createTask">

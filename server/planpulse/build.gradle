@@ -57,6 +57,9 @@ dependencies {
 
     // Spring Boot Starter Test for integration with Spring
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    // For mocking Spring Boot-specific beans (e.g., @Autowired)
+    testImplementation 'org.mockito:mockito-inline:5.5.0'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

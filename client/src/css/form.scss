@@ -1,6 +1,5 @@
-.authForm {
+@mixin form {
     position: absolute;
-    top: 10%;
     left: 25%;
     width: 50%;
 
@@ -31,4 +30,14 @@
             justify-content: space-between;
         }
     }
+}
+
+.authForm {
+    top: 10%;
+    @include form;
+}
+
+.profile {
+    margin-top: 5%;
+    @include form;
 }

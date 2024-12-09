@@ -1,97 +1,73 @@
 import { useContext, useEffect, useState } from "react";
-import UserContext from "../components/User";
-import { useNavigate } from "react-router-dom";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import AppBar from "@mui/material/AppBar";
-import Board from "../components/Board";
-import IconButton from "@mui/material/IconButton";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import UserContext from "../contexts/User";
+import { Outlet, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import { createBoard, getBoards } from "../services/board";
+import { getUser } from "../services/user";
+import CreateBoardDialog from "../components/CreateBoardDialog";
 
-function Dashboard({}){
-	const { user } = useContext(UserContext);
+function Dashboard(){
+	const { user, setUser } = useContext(UserContext);
 	const [authorized, setAuthorized] = useState(false);
+	const [openCreateBoard, setOpenCreateBoard] = useState(false);
 	const nav = useNavigate();
-	const [boards, setBoards] = useState([
-		{
-			title: "Main", 
-			type: "PRIVATE",
-			creatorId: "0",
-			collaboratorIds: [],
-		},
-		{
-			title: "Group 1", 
-			type: "PUBLIC",
-			creatorId: "0",
-			collaboratorIds: [1, 2, 3],
-		},
-		{
-			title: "Group 2", 
-			type: "PUBLIC",
-			creatorId: "0",
-			collaboratorIds: [1, 2, 3],
-		},
-		{
-			title: "Job", 
-			type: "PRIVATE",
-			creatorId: "0",
-			collaboratorIds: [1, 2, 3],
-		},
-	])
+	const [boards, setBoards] = useState([]);
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
+	async function addBoard(newBoard){
+		newBoard.creatorId = user.id;
+		let res = await createBoard(newBoard);
+		if(res.success){
+			setBoards([...boards, res.board]);
+			setCurrentBoard(res.board);
+		} else {
+			alert("Error creating Board");
+		}
+	}
+
 	useEffect(() => {
-		if(user.name.length < 1 || user.email.length < 1 || user.id.length < 1){
-			setAuthorized(false);
-			return;
+		async function loadUser(){
+			let user = await getUser();
+			setUser({
+				id: user.id,
+				email: user.email,
+				uname: user.uname
+			})
+
+			let res = await getBoards(user.id);
+			if(res.success){
+				setBoards(res.boards);
+				setCurrentBoard(res.boards[0]);
+			} else {
+				alert("Error loading boards");
+			}
 		}
 
-		setAuthorized(true);
-	}, [])
-	
+		loadUser();
+	}, []);
+
 	return (
 		<>
-			{ authorized ? 
-			<>
-				<header>
-					<AppBar position="static">
-						<Toolbar>
-							<Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-								PlanPulse	
-							</Typography>
-							<Typography variant="h6" component="div">
-								{ user.email }
-							</Typography>
-							<IconButton
-								size="large"
-								edge="end"
-								color="inherit"
-							>
-								<AccountCircle />
-							</IconButton>
-						</Toolbar>
-					</AppBar>
-				</header>
-
-				<main>
-					<aside>
-						{boards.map((b) => {
-							return (
-								<p 
-									key={`${b.title}`}
-									className={b === currentBoard ? 'selected' : ''}	
-									onClick={(e) => setCurrentBoard(b)}
-								>{ b.title }</p>
-							)
-						})}
-					</aside>
-					<section>
-						<Board board={currentBoard} />
-					</section>
-				</main> 
-			</> : 
-			<p>You are not Authorized to view this page. Go <a href="/login">here</a> to login.</p>
-				}
+			<Header />
+			<main>
+				<aside>
+					{boards.map((b) => {
+						return (
+							<p 
+								key={`${b.title}`}
+								className={b === currentBoard ? 'selected' : ''}	
+								onClick={(e) => {
+									setCurrentBoard(b);
+									nav('/home');
+								}}
+							>{ b.title }</p>
+						)
+					})}
+					<p onClick={() => {setOpenCreateBoard(true)}}>+</p>
+				</aside>
+				<Outlet context={currentBoard} />
+				<CreateBoardDialog open={openCreateBoard} close={() => setOpenCreateBoard(false)} addBoard={addBoard}/>
+			</main> 
 		</>
 	)
 }
