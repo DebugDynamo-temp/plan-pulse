@@ -37,8 +37,11 @@ public class BoardService {
         board.setCreatedAt(new Date());
         board.setUpdatedAt(new Date());
         board.setCreatorId(userId);
+        board.setCollaboratorIds(new ArrayList<>());
+        board.setTaskIds(new ArrayList<>());
         board = boardRepository.save(board);
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getBoardIds() == null) user.setBoardIds(new ArrayList<>());
         user.getBoardIds().add(board.getId());
         userRepository.save(user);
         return board;
@@ -61,10 +64,12 @@ public class BoardService {
                     .orElseThrow(() -> new RuntimeException("Invalid user credentials"));
         }
 
+        if (board.getCollaboratorIds() == null) board.setCollaboratorIds(new ArrayList<>());
         if (!board.getCollaboratorIds().contains(user.getId())) {
             board.getCollaboratorIds().add(user.getId());
             board.setUpdatedAt(new Date());
             board = boardRepository.save(board);
+            if (user.getBoardIds() == null) user.setBoardIds(new ArrayList<>());
             user.getBoardIds().add(board.getId());
             userRepository.save(user);
             return board;
@@ -88,6 +93,7 @@ public class BoardService {
         Task savedTask = taskRepository.save(newTask);
 
         // adding the task ID to the board's taskIds
+        if (board.getTaskIds() == null) board.setTaskIds(new ArrayList<>());
         board.getTaskIds().add(savedTask.getId());
         board.setUpdatedAt(new Date());
         boardRepository.save(board);

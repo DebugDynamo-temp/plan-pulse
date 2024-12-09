@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -42,5 +43,5 @@ public class User {
     // only the profile-img URL stored in the user document
     private String profileImageUrl;
 
-    private List<String> boardIds;
+    private List<String> boardIds = new ArrayList<>();
 }
