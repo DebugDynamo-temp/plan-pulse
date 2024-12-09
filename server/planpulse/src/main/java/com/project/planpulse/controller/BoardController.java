@@ -7,12 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/boards")
 public class BoardController {
 
     @Autowired
     private BoardService boardService;
+
+    @GetMapping("/all")
+    public List<Board> getBoardsForUser(Authentication authentication) {
+        String userId = authentication.getName();
+        return boardService.getBoardsForUser(userId);
+    }
 
     @PostMapping("/create-board")
     public Board createBoard(@RequestBody Board board, Authentication authentication) {

@@ -7,9 +7,11 @@ import com.project.planpulse.repository.BoardRepository;
 import com.project.planpulse.repository.TaskRepository;
 import com.project.planpulse.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class BoardService {
@@ -23,11 +25,22 @@ public class BoardService {
     @Autowired
     private TaskRepository taskRepository;
 
+    public List<Board> getBoardsForUser(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found");
+        }
+        return boardRepository.findByCreatorId(userId);
+    }
+
     public Board createBoard(Board board, String userId) {
         board.setCreatedAt(new Date());
         board.setUpdatedAt(new Date());
         board.setCreatorId(userId);
-        return boardRepository.save(board);
+        board = boardRepository.save(board);
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.getBoardIds().add(board.getId());
+        userRepository.save(user);
+        return board;
     }
 
     public Board getBoardById(String boardId) {
@@ -53,7 +66,10 @@ public class BoardService {
         if (!board.getCollaboratorIds().contains(user.getId())) {
             board.getCollaboratorIds().add(user.getId());
             board.setUpdatedAt(new Date());
-            return boardRepository.save(board);
+            board = boardRepository.save(board);
+            user.getBoardIds().add(board.getId());
+            userRepository.save(user);
+            return board;
         } else {
             throw new RuntimeException("The user already has access to the board.");
         }
