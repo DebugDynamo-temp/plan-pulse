@@ -1,8 +1,6 @@
 package com.project.planpulse.service;
 
-import com.project.planpulse.model.Board;
 import com.project.planpulse.model.Task;
-import com.project.planpulse.repository.BoardRepository;
 import com.project.planpulse.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
