@@ -34,7 +34,11 @@ function Dashboard(){
 	useEffect(() => {
 		async function user(){
 			let user = await getUser();
-			console.log(user);
+			setUser({
+				id: user.id,
+				email: user.email,
+				uname: user.uname
+			})
 		}
 
 		user();

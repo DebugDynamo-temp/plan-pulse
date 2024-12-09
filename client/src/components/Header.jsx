@@ -31,7 +31,7 @@ function Header(){
                     PlanPulse	
                 </Typography>
                 <Typography variant="h6" component="div">
-                    { "Placeholder" }
+                    { user.uname }
                 </Typography>
                 <IconButton
                     onClick={(e) => setAnchorEl(e.currentTarget)}

@@ -26,7 +26,12 @@ async function getUser(){
         }
 
         response = await response.json();
-        console.log(response);
+        return {
+            success: true,
+            email: response.email,
+            uname: response.username,
+            id: response.id
+        } 
     } catch(e) {
         return {
             success: false,
