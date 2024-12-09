@@ -87,7 +87,7 @@ function Login() {
                 <a href='/forgot-password'>Forgot your password?</a>
                 <footer>
                     <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
-                    <Button variant='contained' type='submit' disabled={!isDirty || !isValid} >Login</Button>
+                    <Button variant='contained' type='submit' disabled={!isDirty || !isValid} data-testid='login-button'>Login</Button>
                 </footer>
             </Paper> 
         </form>
