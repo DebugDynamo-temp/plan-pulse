@@ -21,7 +21,7 @@ public class Task {
     private String description;
     private String reporterId;
     private String assigneeId;
-    private String priority; // LOW, MEDIUM, HIGH
+    private int priority; // LOW, MEDIUM, HIGH, or any number
     private long timeSpent = 0; // stored in minutes
     private Date startTime;
     private Date endTime;

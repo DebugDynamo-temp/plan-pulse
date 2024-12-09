@@ -3,6 +3,7 @@ package com.project.planpulse.controller;
 import com.project.planpulse.model.Task;
 import com.project.planpulse.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +27,9 @@ public class TaskController {
     }
 
     @PutMapping("/{taskId}/status")
-    public Task updateTaskStatus(@PathVariable String taskId, @RequestBody String status) {
-        return taskService.updateTaskStatus(taskId, status);
+    public Task updateTaskStatus(@PathVariable String taskId, @RequestBody String status, Authentication authentication) {
+        String requesterId = authentication.getName();
+        return taskService.updateTaskStatus(taskId, status, requesterId);
     }
 
     @PostMapping("/{taskId}/time")
