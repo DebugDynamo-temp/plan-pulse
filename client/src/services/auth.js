@@ -59,7 +59,7 @@ async function register(first, last, email, uname, pswd, confirmPswd){
 
         response = await response.json();
 
-        Cookies.set('token', response.token, { expires: 1 });
+        Cookies.set('JWT-TOKEN', response.token, { expires: 1 });
         return {
             success: true,
             user: response
