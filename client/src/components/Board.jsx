@@ -1,34 +1,64 @@
 import Button from "@mui/material/Button";
 import CreateTaskDialog from "./CreateTaskDialog";
 import { status, statusToReadable } from "../services/utils";
+import UserContext from "../contexts/User";
 import { useContext, useEffect, useState } from "react";
 import Task from "./Task";
-import TaskContext from "../components/TaskContext";
+import { createTask, getTasksByBoard } from "../services/task";
+import CollaboratorDialog from "./CollaboratorDialog";
+import { addCollaborator } from "../services/board";
 
 function Board({ board }){
-	const { tasks } = useContext(TaskContext);
-	const [statusCollection, setStatus] = useState(status);
+	const { user } = useContext(UserContext);
 	const [openCreateTask, setOpenCreateTask] = useState(false);
-	const [displayTasks, setTasks] = useState(tasks[board.title]);
+	const [openCollaborator, setOpenCollaborator] = useState(false);
+	const [displayTasks, setTasks] = useState([]);
 
-	function setClosed(){
+	function setTaskClosed(){
 		setOpenCreateTask(false);
 	}
-	
-	function addTask(newTask){
+
+	function setCollaboratorClosed(){
+		setOpenCollaborator(false);
+	}
+
+	async function addCollab(identifier){
+		let res = await addCollaborator(identifier);
+		if(!res.success){
+			alert("Failed to add collaborator");
+		}
+	}
+
+	async function addTask(newTask){
+		newTask.boardId = board.id;
 		newTask.startTime = new Date();
 		newTask.endTime = new Date();
 		newTask.startTime = new Date();
-		newTask.reporterId = 0;
+		newTask.reporterId = user.id;
 		newTask.assigneeId = 0;
 		newTask.timeSpent = 0;
 		console.log(newTask);
-		setTasks([...displayTasks, newTask]);
+		let res = await createTask(newTask);
+		if(res.success){
+			setTasks([...displayTasks, newTask]);
+		} else {
+			alert("Error Creating Task");
+		}
+	}
+	
+	function changeStatus(task, idx){
+		let tasksCopy = displayTasks.toSpliced(idx, 1);
+		tasksCopy.push(task);
+		setTasks(tasksCopy)
 	}
 
 	useEffect(() => {
-		console.log(board.title);
-		setTasks([...tasks[board.title]]);
+		async function loadTasks() {
+			let tasks = await getTasksByBoard(board.id);
+			setTasks(tasks.tasks);
+		}
+
+		loadTasks();
 	}, [board])
 
 	return (
@@ -36,6 +66,14 @@ function Board({ board }){
 			<header>
 				<h1>{board.title}</h1>
 				<Button
+					variant="contained"
+					color="secondary"
+					onClick={(e) => setOpenCollaborator((prev) => !prev)}
+				>
+					Add Collaborator 
+				</Button>
+				<Button
+					data-testid="create-task"
 					variant="contained"
 					color="secondary"
 					onClick={(e) => setOpenCreateTask((prev) => !prev)}
@@ -48,16 +86,17 @@ function Board({ board }){
 					return (
 						<div className={s.toLowerCase()} key={`${s}-container`}>
 							<h3>{ statusToReadable(s) }</h3>
-							{displayTasks.filter((t) => {
+							{displayTasks ? displayTasks.filter((t) => {
 								return t.status === s;
-							}).map((t) => {
-								return <Task task={t} key={t.title} />
-							})}
+							}).map((t, idx) => {
+								return <Task task={t} key={t.title} idx={idx} onStatusChange={() => { changeStatus(t) }} />
+							}) : ''}
 						</div>
 					)
 				})}
 			</div>
-			<CreateTaskDialog open={openCreateTask} close={setClosed} addTask={addTask}/>
+			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} />
+			<CollaboratorDialog open={openCollaborator} close={setCollaboratorClosed} addCollaborator={addCollab} />
 		</>	
 	)
 }

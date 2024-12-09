@@ -1,6 +1,7 @@
 @use 'sass:list';
 @import './css/form.scss';
-@import './css/createTask.scss';
+@import './css/dialog.scss';
+@import './css/task.scss';
 
 $blue: #2196f3;
 $pink: #f06292;
@@ -73,6 +74,50 @@ html, body {
                 
                 button {
                     height: 70%;
+                }
+            }
+
+            &.taskDetailed {
+                display: grid;
+                padding: 10px;
+                height: calc(100vh - 85px);
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+                gap: 10px 10px;
+
+                #desc {
+                    grid-row: span 2;
+                    grid-column: span 3;
+                    display: flex;
+                }
+
+                #deadline {
+                    grid-row: span 1;
+                    grid-column: span 1;
+                }
+
+                #status {
+                    grid-row: span 1;
+                    grid-column: span 1;
+                }
+
+                #timer {
+                    display: flex;
+                    justify-content: center;
+                    flex-direction: column;
+                    align-items: center;
+                    grid-column: span 3;
+
+                    span {
+                        font-size: 3em;
+                    }
+                }
+
+                @each $p in $priorities {
+                    $i: index($priorities, $p);
+                    .p-#{$i} {
+                        background-color: $p;
+                    }
                 }
             }
         }
