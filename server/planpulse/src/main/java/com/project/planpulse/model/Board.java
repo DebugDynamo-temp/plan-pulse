@@ -15,7 +15,7 @@ public class Board {
     @Id
     private String id;
     private String title;
-    private String type = "PRIVATE"; // PRIVATE or PUBLIC
+    private String type = "PUBLIC"; // PRIVATE or PUBLIC
     private String creatorId;
     private List<String> collaboratorIds; // Users who can modify tasks
     private List<String> taskIds; // Tasks in this board
