@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,7 +51,6 @@ public class BoardService {
     // add a collaborator by email or username
     public Board addCollaborator(String requesterId, String boardId, String identifier) {
         Board board = getBoardById(boardId);
-        // must have permission
         validateAddPermission(board, requesterId);
         User user;
         if (isEmail(identifier)) {

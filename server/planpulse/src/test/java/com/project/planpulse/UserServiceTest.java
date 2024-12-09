@@ -1,3 +1,5 @@
+package com.project.planpulse;
+
 import com.project.planpulse.model.User;
 import com.project.planpulse.repository.UserRepository;
 import com.project.planpulse.repository.PasswordResetTokenRepository;
@@ -9,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -31,49 +34,57 @@ public class UserServiceTest {
     private MultipartFile mockFile;
 
     @Test
-    void registerUserWithValidProfileImage_success() throws IOException {
+    void registerUserWithInvalidProfileImage_success() throws IOException {
         String firstName = "Test";
         String lastName = "User";
         String username = "test_user";
         String email = "testuser@gmail.com";
-        String password = "t!";
-        String confirmPassword = "StrongPassword123!";
+        String password = "T1$estpassword";
+        String confirmPassword = "T1$estpassword";
+        // Mock repository checks
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(false);
+
+        // Mock invalid profile image behavior
         when(mockFile.isEmpty()).thenReturn(false);
-        when(mockFile.getContentType()).thenReturn("image/jpeg");
-        when(mockFile.getOriginalFilename()).thenReturn("profile.jpg");
-        doReturn(new byte[0]).when(mockFile).getBytes();
+        when(mockFile.getContentType()).thenReturn("application/pdf"); // Invalid content type
 
-        // Act
-        User user = userService.registerUserWithMultipart(firstName, lastName, username, email, password, confirmPassword, mockFile);
+        // Mock repository save to return a valid User
+        User mockUser = new User();
+        mockUser.setFirstname(firstName);
+        mockUser.setLastname(lastName);
+        mockUser.setUsername(username);
+        mockUser.setEmail(email);
+        when(userRepository.save(any(User.class))).thenReturn(mockUser);
 
-        // Assert
-        assertNotNull(user);
-        assertEquals(firstName, user.getFirstname());
-        assertEquals(email, user.getEmail());
-        verify(userRepository).save(any(User.class));
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                userService.registerUserWithMultipart(firstName, lastName, username, email, password, confirmPassword, mockFile)
+        );
+
+        assertEquals("Invalid file type. Only image files are allowed.", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class)); // Ensure save is never called
     }
 
     @Test
     void registerUserWithDuplicateEmail_throwsException() {
-        String username = "johndoe";
-        String email = "johndoe@example.com";
+        String username = "test_user";
+        String email = "testuser@gmail.com";
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                userService.registerUserWithMultipart("John", "Doe", username, email, "password123", "password123", null));
+                userService.registerUserWithMultipart("Test123", "User", username, email, "T1$estpassword", "T1$estpassword", null));
         assertEquals("Username or Email already exists", exception.getMessage());
     }
 
     @Test
     void updateUserWithNewProfileImage_success() throws IOException {
-        String userId = "user123";
+        String userId = "test_user";
         String newUsername = "newusername";
         when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
         when(mockFile.isEmpty()).thenReturn(false);
         when(mockFile.getContentType()).thenReturn("image/jpeg");
-        when(mockFile.getOriginalFilename()).thenReturn("newimage.jpg");
+        when(mockFile.getOriginalFilename()).thenReturn("newimage.jpeg");
         doReturn(new byte[0]).when(mockFile).getBytes();
 
         User updatedUser = userService.updateUserWithMultipart(userId, newUsername, null, null, null, mockFile);
@@ -84,7 +95,7 @@ public class UserServiceTest {
 
     @Test
     void updateUserWithInvalidImageType_throwsException() {
-        String userId = "user123";
+        String userId = "test_user";
         when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
         when(mockFile.getContentType()).thenReturn("application/pdf");
 
