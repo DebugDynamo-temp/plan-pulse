@@ -5,7 +5,6 @@ import com.project.planpulse.model.User;
 import com.project.planpulse.repository.PasswordResetTokenRepository;
 import com.project.planpulse.repository.UserRepository;
 import com.project.planpulse.validation.PasswordValidator;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -245,7 +244,7 @@ public class UserService {
     }
 
     public User authenticateByEmail(String email, String password) {
-        User user = getUserByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Invalid login credentials"));
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return user;
         }
@@ -261,8 +260,12 @@ public class UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+    public User getUserByEmail(String email, String requesterId) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
+        if (!user.getId().equals(requesterId)) {
+            throw new RuntimeException("Unauthorized access");
+        }
+        return user;
     }
 
     public void deleteUser(String userId) throws RuntimeException {
@@ -280,10 +283,7 @@ public class UserService {
     }
 
     public void initiatePasswordReset(String email) throws RuntimeException {
-        User user = getUserByEmail(email);
-        if (user == null) {
-            throw new RuntimeException("Invalid credentials.");
-        }
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Invalid credentials"));
         PasswordResetToken resetToken = new PasswordResetToken(user.getId(), 15);
         passwordResetTokenRepository.save(resetToken);
         emailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken());
@@ -308,7 +308,7 @@ public class UserService {
         passwordResetTokenRepository.delete(resetToken);
     }
 
-    public void resetPassword(@Valid User user, String currentPassword, String newPassword, String confirmPassword) throws RuntimeException {
+    public void resetPassword(User user, String currentPassword, String newPassword, String confirmPassword) throws RuntimeException {
         if (newPassword == null || newPassword.isBlank()) {
             throw new RuntimeException("New password cannot be empty");
         }
