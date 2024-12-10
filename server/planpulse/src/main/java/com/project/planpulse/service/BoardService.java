@@ -71,8 +71,10 @@ public class BoardService {
                     .orElseThrow(() -> new RuntimeException("Invalid user credentials"));
         }
 
-        if (board.getCollaboratorIds() == null) board.setCollaboratorIds(new ArrayList<>());
-        if (!board.getCollaboratorIds().contains(user.getId())) {
+        if (board.getCollaboratorIds() == null) {
+            board.setCollaboratorIds(new ArrayList<>());
+        }
+        if (!board.getCollaboratorIds().contains(user.getId()) && !user.getId().equals(requesterId)) {
             board.getCollaboratorIds().add(user.getId());
             board.setUpdatedAt(new Date());
             board = boardRepository.save(board);

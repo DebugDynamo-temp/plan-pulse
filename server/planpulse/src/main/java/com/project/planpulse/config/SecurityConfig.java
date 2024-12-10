@@ -1,7 +1,6 @@
 package com.project.planpulse.config;
 
 import com.project.planpulse.filter.JwtAuthenticationFilter;
-import com.project.planpulse.filter.RateLimitingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +9,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -20,22 +20,25 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Autowired
-    private RateLimitingFilter rateLimitingFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/auth/**")
-                                .permitAll().anyRequest().authenticated())
-                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(
-                        (req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED)
-                ));
+        http.csrf(AbstractHttpConfigurer::disable) // disable CSRF for APIs
+                .cors(Customizer.withDefaults()) // enable CORS with default settings
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // stateless application
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll() // unauthenticated access to /auth/** endpoints
+                        .anyRequest().authenticated() // needs authentication for all other endpoints
+                )
+                .formLogin(AbstractHttpConfigurer::disable) // disable the form login (default) or the UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) -> {
+                            res.setContentType("application/json");
+                            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            res.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                );
 
         return http.build();
     }
-
 }
