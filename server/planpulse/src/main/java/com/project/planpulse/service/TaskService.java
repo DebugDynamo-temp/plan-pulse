@@ -48,7 +48,7 @@ public class TaskService {
             throw new RuntimeException("Invalid credentials");
         }
         Task task = getTaskById(taskId, requesterId);
-        if (validateStatusTransition(status)) {
+        if (isInvalidStatus(status)) {
             throw new RuntimeException("Invalid status transition");
         }
         task.setStatus(status);
@@ -71,7 +71,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    private boolean validateStatusTransition(String newStatus) {
+    private boolean isInvalidStatus(String newStatus) {
         return !(Set.of("TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE").contains(newStatus));
     }
 }

@@ -1,6 +1,5 @@
 package com.project.planpulse.controller;
 
-import com.project.planpulse.model.Board;
 import com.project.planpulse.model.User;
 import com.project.planpulse.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,7 +42,8 @@ public class UserController {
     }
 
     @PutMapping(value = "/reset-password")
-    public Map<String, String> resetPassword(@RequestBody Map<String, String> request) throws RuntimeException {
+    public Map<String, String> resetPassword(@RequestBody Map<String, String> request, Authentication authentication) throws RuntimeException {
+        String requesterId = authentication.getName();
         String email = request.get("email");
         String currentPassword = request.get("password");
         String newPassword = request.get("newPassword");
@@ -52,8 +51,7 @@ public class UserController {
         if (email == null || email.isBlank()) {
             throw new RuntimeException("Email is required");
         }
-        User user = userService.getUserByEmail(email);
-        if (user == null) throw new RuntimeException("Invalid credentials!");
+        User user = userService.getUserByEmail(email, requesterId);
         userService.resetPassword(user, currentPassword, newPassword, confirmPassword);
         return Map.of("message", "Password changed successfully.");
     }
