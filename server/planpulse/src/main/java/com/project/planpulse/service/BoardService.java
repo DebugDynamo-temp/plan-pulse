@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class BoardService {
@@ -30,7 +28,14 @@ public class BoardService {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found");
         }
-        return boardRepository.findByCreatorId(userId);
+        // fetch boards where the user is the creator
+        List<Board> createdBoards = boardRepository.findByCreatorId(userId);
+        // fetch boards where the user is a collaborator
+        List<Board> collaboratorBoards = boardRepository.findByCollaboratorIds(userId);
+        // combining the two lists
+        Set<Board> allBoards = new HashSet<>(createdBoards);
+        allBoards.addAll(collaboratorBoards);
+        return new ArrayList<>(allBoards);
     }
 
     public Board createBoard(Board board, String userId) {
@@ -47,13 +52,15 @@ public class BoardService {
         return board;
     }
 
-    public Board getBoardById(String boardId) {
-        return boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("Board not found"));
+    public Board getBoardById(String boardId, String requesterId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("Board not found"));
+        validateAddPermission(board, requesterId);
+        return board;
     }
 
     // add a collaborator by email or username
     public Board addCollaborator(String requesterId, String boardId, String identifier) {
-        Board board = getBoardById(boardId);
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("Board not found"));
         validateAddPermission(board, requesterId);
         User user;
         if (isEmail(identifier)) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TaskService {
@@ -27,28 +28,35 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Task getTaskById(String taskId) {
-        return taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
+    public Task getTaskById(String taskId, String requesterId) {
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
+        Board board = boardRepository.findById(task.getBoardId()).orElseThrow(() -> new RuntimeException("Invalid Details"));
+        validatePermission(board, requesterId);
+        return task;
     }
 
     // retrieve all tasks for a given board
-    public List<Task> getTasksByBoard(String boardId) {
+    public List<Task> getTasksByBoard(String boardId, String requesterId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("Invalid board details"));
+        validatePermission(board, requesterId);
         return taskRepository.findByBoardId(boardId);
     }
 
     // update the task's status
     public Task updateTaskStatus(String taskId, String status, String requesterId) {
-        if (requesterId == null || requesterId.isBlank()) throw new RuntimeException("Invalid credentials");
-        Task task = getTaskById(taskId);
-        Board board = boardRepository.findById(task.getBoardId()).orElseThrow(() -> new RuntimeException("Invalid Details"));
-        validateAddPermission(board, requesterId);
-//        validateStatusTransition(task.getStatus(), status);
+        if (requesterId == null || requesterId.isBlank() || status == null || status.isBlank() || taskId == null || taskId.isBlank()) {
+            throw new RuntimeException("Invalid credentials");
+        }
+        Task task = getTaskById(taskId, requesterId);
+        if (validateStatusTransition(status)) {
+            throw new RuntimeException("Invalid status transition");
+        }
         task.setStatus(status);
         task.setUpdatedAt(new Date());
         return taskRepository.save(task);
     }
 
-    private void validateAddPermission(Board board, String requesterId) {
+    private void validatePermission(Board board, String requesterId) {
         if (!board.getCreatorId().equals(requesterId) &&
                 (board.getCollaboratorIds() == null || !board.getCollaboratorIds().contains(requesterId))) {
             throw new RuntimeException("Permission denied: The user does not have access to add to this board.");
@@ -56,34 +64,14 @@ public class TaskService {
     }
 
     // Track time spent on a task
-    public Task trackTime(String taskId, long minutes) {
-        Task task = getTaskById(taskId);
+    public Task trackTime(String taskId, long minutes, String requesterId) {
+        Task task = getTaskById(taskId, requesterId);
         task.setTimeSpent(task.getTimeSpent() + minutes);
         task.setUpdatedAt(new Date());
         return taskRepository.save(task);
     }
 
-//    private void validateStatusTransition(String currentStatus, String newStatus) {
-//        switch (currentStatus) {
-//            case "TO_DO":
-//                if (!newStatus.equals("IN_PROGRESS")) {
-//                    throw new RuntimeException("Invalid transition: TO_DO can only move to IN_PROGRESS");
-//                }
-//                break;
-//            case "IN_PROGRESS":
-//                if (!List.of("IN_REVIEW", "DONE").contains(newStatus)) {
-//                    throw new RuntimeException("Invalid transition: IN_PROGRESS can only move to IN_REVIEW or DONE");
-//                }
-//                break;
-//            case "IN_REVIEW":
-//                if (!newStatus.equals("DONE")) {
-//                    throw new RuntimeException("Invalid transition: IN_REVIEW can only move to DONE");
-//                }
-//                break;
-//            case "DONE":
-//                throw new RuntimeException("DONE is a terminal status and cannot transition further");
-//            default:
-//                throw new RuntimeException("Unknown current status: " + currentStatus);
-//        }
-//    }
+    private boolean validateStatusTransition(String newStatus) {
+        return !(Set.of("TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE").contains(newStatus));
+    }
 }
