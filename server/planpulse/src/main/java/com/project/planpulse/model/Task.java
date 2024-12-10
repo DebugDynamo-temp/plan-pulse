@@ -23,8 +23,8 @@ public class Task {
     private String assigneeId;
     private int priority; // LOW, MEDIUM, HIGH, or any number
     private long timeSpent = 0; // stored in minutes
-    private Date startTime;
-    private Date endTime;
+    //    private Date startTime;
+//    private Date endTime;
     private Date deadline;
     private String status = "TO_DO"; // TO_DO, IN_PROGRESS, IN_REVIEW, DONE
     private Date createdAt = new Date();

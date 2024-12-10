@@ -1,11 +1,16 @@
 package com.project.planpulse.service;
 
+import com.project.planpulse.model.Board;
 import com.project.planpulse.model.PasswordResetToken;
+import com.project.planpulse.model.Task;
 import com.project.planpulse.model.User;
+import com.project.planpulse.repository.BoardRepository;
 import com.project.planpulse.repository.PasswordResetTokenRepository;
+import com.project.planpulse.repository.TaskRepository;
 import com.project.planpulse.repository.UserRepository;
 import com.project.planpulse.validation.PasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -27,14 +30,24 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private BoardRepository boardRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private CloudStorageService cloudStorageService;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
+
 
     // Register user with multipart (including optional profile image)
     public User registerUserWithMultipart(String firstName,
@@ -50,8 +63,17 @@ public class UserService {
         }
         // If profile image is provided, store it
         String profileImageUrl = null;
+        /*
+        // Local code:
         if (profileImage != null && !profileImage.isEmpty()) {
             profileImageUrl = storeProfileImage(profileImage);
+        }
+        */
+
+        // Cloud version
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String destination = String.format("uploads/%s-%s", UUID.randomUUID(), profileImage.getOriginalFilename());
+            profileImageUrl = cloudStorageService.uploadFile(profileImage, destination);
         }
 
         User user = new User();
@@ -66,13 +88,14 @@ public class UserService {
     }
 
     // Update user with multipart (including optional profile image)
-    public User updateUserWithMultipart(String userId,
-                                        String username,
-                                        String email,
-                                        String firstname,
-                                        String lastname,
-                                        MultipartFile profileImage) throws IOException, RuntimeException {
-        User existingUser = getUserById(userId);
+    public Map<String, Object> updateUserWithMultipart(String userId,
+                                                       String username,
+                                                       String email,
+                                                       String firstname,
+                                                       String lastname,
+                                                       MultipartFile profileImage) throws IOException, RuntimeException {
+        Map<String, Object> userInfo = getUserById(userId);
+        User existingUser = (User) userInfo.get("user");
         // Update fields if provided
         if (username != null && !username.isBlank()) {
             if (!existingUser.getUsername().equals(username) && userRepository.existsByUsername(username)) {
@@ -92,6 +115,9 @@ public class UserService {
         if (lastname != null && !lastname.isBlank()) {
             existingUser.setLastname(lastname);
         }
+
+        /*
+        // Local code:
         // handle profile image update if new image is provided
         if (profileImage != null && !profileImage.isEmpty()) {
             String oldImageUrl = existingUser.getProfileImageUrl();
@@ -104,7 +130,26 @@ public class UserService {
             // update user with the new URL
             existingUser.setProfileImageUrl(newImageUrl);
         }
-        return userRepository.save(existingUser);
+        */
+
+        // handle profile image update if new image is provided
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String oldImageUrl = existingUser.getProfileImageUrl();
+            String destination = String.format("uploads/%s-%s", UUID.randomUUID(), profileImage.getOriginalFilename());
+            String newImageUrl = cloudStorageService.uploadFile(profileImage, destination);
+
+            // delete the old image from Cloud Storage if it exists
+            if (oldImageUrl != null && !oldImageUrl.isBlank()) {
+                String oldFileName = oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1);
+                cloudStorageService.deleteFile("uploads/" + oldFileName);
+            }
+
+            // update the user profile image URL
+            existingUser.setProfileImageUrl(newImageUrl);
+        }
+
+        userInfo.put("user", userRepository.save(existingUser));
+        return userInfo;
     }
 
     private void validateUserRegistrationFields(String firstName, String lastName, String username, String email, String password, String confirmPassword) {
@@ -134,6 +179,8 @@ public class UserService {
         }
     }
 
+    /*
+    // Local version not using google cloud
     private String storeProfileImage(MultipartFile file) throws IOException, RuntimeException {
         if (file.isEmpty()) {
             throw new RuntimeException("File is empty. Please upload a valid image.");
@@ -168,6 +215,7 @@ public class UserService {
         // relative URL for storage in the database
         return "/uploads/" + uniqueFilename;
     }
+     */
 
     private boolean isValidImageMimeType(String mimeType) {
         return mimeType.equals("image/jpeg") ||
@@ -220,6 +268,8 @@ public class UserService {
         return false;
     }
 
+    /*
+    // Local version (not using google cloud)
     private void deleteOldProfileImage(String imageUrl) {
         // /uploads/filename.extension - file format processed
         if (!imageUrl.startsWith("/uploads/")) {
@@ -234,9 +284,10 @@ public class UserService {
             System.err.println("Failed to delete old profile image: " + oldFilePath + " - " + e.getMessage());
         }
     }
+     */
 
     public User authenticateByUsername(String username, String password) {
-        User user = getUserByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Invalid login credentials"));
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return user;
         }
@@ -251,35 +302,76 @@ public class UserService {
         return null;
     }
 
-    public User getUserById(String userId) throws RuntimeException {
-        return userRepository.findById(userId)
+    public Map<String, Object> getUserById(String userId) throws RuntimeException {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    }
 
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
-    }
+        // retrieve the profile image as a Resource from cloud
+        Resource profileImage = null;
+        String profileImageUrl = user.getProfileImageUrl();
 
-    public User getUserByEmail(String email, String requesterId) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
-        if (!user.getId().equals(requesterId)) {
-            throw new RuntimeException("Unauthorized access");
+        if (profileImageUrl != null && !profileImageUrl.isBlank()) {
+            try {
+                String fileName = profileImageUrl.substring(profileImageUrl.lastIndexOf("/") + 1);
+                profileImage = cloudStorageService.downloadFile(fileName);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to load profile image: " + e.getMessage());
+            }
         }
-        return user;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", user);
+        response.put("profileImage", profileImage);
+        return response;
     }
+
+//    public User getUserByEmail(String email, String requesterId) {
+//        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
+//        if (!user.getId().equals(requesterId)) {
+//            throw new RuntimeException("Unauthorized access");
+//        }
+//        return user;
+//    }
 
     public void deleteUser(String userId) throws RuntimeException {
-        User user = getUserById(userId);
-        if (user != null) {
-            // delete user's profile image if exists
-            String imageUrl = user.getProfileImageUrl();
-            if (imageUrl != null && !imageUrl.isBlank()) {
-                deleteOldProfileImage(imageUrl);
-            }
-            userRepository.deleteById(userId);
-        } else {
-            throw new RuntimeException("User not found");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // delete user's profile image if exists from cloud
+        String imageUrl = user.getProfileImageUrl();
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+            cloudStorageService.deleteFile("uploads/" + fileName);
         }
+
+        // get all boards created by the user
+        List<Board> boards = boardRepository.findByCreatorId(user.getId());
+
+        // delete associated tasks and update collaborators
+        for (Board board : boards) {
+            // delete all tasks associated with the board
+            List<Task> tasks = taskRepository.findByBoardId(board.getId());
+            taskRepository.deleteAll(tasks);
+
+            // update collaborators for the board
+            List<String> collaboratorIds = board.getCollaboratorIds();
+            if (collaboratorIds != null && !collaboratorIds.isEmpty()) {
+                for (String collaboratorId : collaboratorIds) {
+                    userRepository.findById(collaboratorId).ifPresent(collaborator -> {
+                        if (collaborator.getBoardIds() != null) {
+                            collaborator.getBoardIds().remove(board.getId());
+                            userRepository.save(collaborator);
+                        }
+                    });
+                }
+            }
+        }
+
+        // delete all boards created by the user
+        boardRepository.deleteAll(boards);
+
+        // then delete the user
+        userRepository.deleteById(userId);
     }
 
     public void initiatePasswordReset(String email) throws RuntimeException {
@@ -302,7 +394,7 @@ public class UserService {
             passwordResetTokenRepository.delete(resetToken);
             throw new RuntimeException("Token has expired");
         }
-        User user = getUserById(resetToken.getUserId());
+        User user = userRepository.findById(resetToken.getUserId()).orElseThrow(() -> new RuntimeException("Invalid token or credentials"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         passwordResetTokenRepository.delete(resetToken);
@@ -331,4 +423,11 @@ public class UserService {
         return validator.isValid(password, null);
     }
 
+    public User getUserByEmail(String email, String requesterId) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        if (!user.getId().equals(requesterId)) {
+            throw new RuntimeException("Unauthorized access");
+        }
+        return user;
+    }
 }

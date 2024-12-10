@@ -8,7 +8,7 @@ group = 'com.project'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -39,9 +39,6 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // for Jackson support JSON serialization/deserialization
 
-    // Redis Client
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -62,7 +59,9 @@ dependencies {
     //testImplementation 'org.mockito:mockito-inline:5.5.0'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+    
+    // google cloud storage
+    implementation("com.google.cloud:google-cloud-storage:2.23.0")
 }
 
 tasks.named('test') {
@@ -70,5 +69,5 @@ tasks.named('test') {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.release = 23
+    options.release = 21
 }

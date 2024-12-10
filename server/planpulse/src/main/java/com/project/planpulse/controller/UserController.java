@@ -22,14 +22,14 @@ public class UserController {
 
     // Get user profile
     @GetMapping("/profile")
-    public User getUserProfile(Authentication authentication) {
+    public Map<String, Object> getUserProfile(Authentication authentication) {
         String userId = authentication.getName(); // user ID from JWT token
         return userService.getUserById(userId);
     }
 
     // Update user profile
     @PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public User updateUserProfile(
+    public Map<String, Object> updateUserProfile(
             Authentication authentication,
             @RequestParam(name = "firstname", required = false) String firstname,
             @RequestParam(name = "lastname", required = false) String lastname,
@@ -58,7 +58,7 @@ public class UserController {
 
     // Delete own account
     @DeleteMapping("/profile")
-    public Map<String, String> deleteUserProfile(Authentication authentication, HttpServletResponse response) {
+    public Map<String, String> deleteUser(Authentication authentication, HttpServletResponse response) {
         String userId = authentication.getName();
         userService.deleteUser(userId);
         // Remove JWT cookie as user is deleted
