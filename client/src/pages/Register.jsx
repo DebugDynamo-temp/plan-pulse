@@ -2,8 +2,13 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useForm, Controller } from 'react-hook-form';
+import { useContext } from 'react';
+import User from '../contexts/User';
+import { useNavigate } from 'react-router-dom';
+import { register } from '../services/auth';
 
 function Register() {
+    const nav = useNavigate();
     const { 
         control, 
         handleSubmit, 
@@ -20,16 +25,22 @@ function Register() {
             fname: '',
             lname: '',
             email: '',
+            uname: '',
             pswd: '',
             confirmPswd: ''
         }
     });
     const pswd = watch('pswd', '');
+    const { user, setUser } = useContext(User);
 
-    function submit(data, e){
-        //send data to server to create user, filtering out the confirmPswd
-        delete data.confirmPswd;
-        console.log(data);
+    async function submit(data, e){
+        let res = await register(data.fname, data.lname, data.email, data.uname, data.pswd, data.confirmPswd);
+        if(res.success){
+            setUser(res.user.userId);
+            nav('/home');
+        } else {
+            alert('Registration failed');
+        }
     }
 
     return ( 
@@ -81,7 +92,7 @@ function Register() {
                             value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                             message: 'Please enter a valid email'
                         }
-                     }}
+                    }}
                     render={({ field: { onChange, value }}) => (
                         <TextField 
                             className='textField' 
@@ -92,6 +103,26 @@ function Register() {
                             variant='outlined' 
                             error={errors.email ? true : false} 
                             helperText={errors.email?.message}
+                            autoComplete='new-password'
+                            fullWidth required 
+                        /> 
+                    )}
+                />
+                <Controller
+                    name="uname"
+                    control={control}
+                    rules={{ required: "Username is required." }}
+                    render={({ field: { onChange, value }}) => (
+                        <TextField 
+                            className='textField' 
+                            value={value}
+                            onChange={onChange}
+                            id='uname' 
+                            label='Username' 
+                            variant='outlined' 
+                            error={errors.fname ? true : false} 
+                            helperText={errors.fname?.message}
+                            autoComplete='username'
                             fullWidth required 
                         /> 
                     )}
@@ -100,8 +131,11 @@ function Register() {
                     name="pswd"
                     control={control}
                     rules={{ 
-                        required: "Password is required and must be 8 characters long",
-                        minLength: 8
+                        maxLength: 30,
+                        pattern: {
+                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                            message: "Password must contain 8 characters, including one lower and uppercase letter, one number, and one special character"
+                        }
                     }}
                     render={({ field: { onChange, value }}) => (
                         <TextField 
@@ -114,6 +148,7 @@ function Register() {
                             variant='outlined'
                             error={errors.pswd ? true : false}
                             helperText={errors.pswd?.message}
+                            autoComplete='new-password'
                             fullWidth required
                         /> 
                     )}
@@ -134,6 +169,7 @@ function Register() {
                             id='confirmPswd'
                             label='Confirm Password'
                             variant='outlined'
+                            autoComplete='new-password'
                             error={errors.confirmPswd || errors.pswd || value !== pswd? true : false}
                             fullWidth required
                         /> 

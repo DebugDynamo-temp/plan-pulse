@@ -1,10 +1,12 @@
 import Button from '@mui/material/Button';
+import CustomSnackbar from '../components/Snackbar';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import UserContext from '../components/User';
+import UserContext from '../contexts/User';
+import { login } from '../services/auth';
 
 function Login() {
     const nav = useNavigate();
@@ -22,19 +24,18 @@ function Login() {
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            email: '',
+            identifier: '',
             pswd: '',
         }
     });
 
-    function submit(data){
-        //send data to server to sign-in user
-        setUser({
-            name: 'Jack',
-            email: data.email,
-            id: 0
-        }) 
-        nav('/dashboard');
+    async function submit(data){
+        let res = await login(data.identifier, data.pswd);
+        if(res.success){
+            nav('/home');
+        } else {
+            alert('Login failed');
+        }
     }
 
     return ( 
@@ -42,19 +43,20 @@ function Login() {
             <Paper id="paper">
                 <h1>Sign In:</h1>
                 <Controller
-                    name="email"
+                    name="identifier"
                     control={control}
-                    rules={{ required: 'Email is required' }}
+                    rules={{ required: 'Email or Username is required' }}
                     render={({ field: { onChange, value }}) => (
                         <TextField 
                             className='textField' 
                             value={value}
                             onChange={onChange}
-                            id='email' 
-                            label='Email' 
+                            id='identifier' 
+                            label='Email/Username' 
                             variant='outlined' 
                             error={errors.email ? true : false} 
                             helperText={errors.email?.message}
+                            autoComplete='username'
                             fullWidth required 
                         /> 
                     )}
@@ -76,14 +78,16 @@ function Login() {
                             variant='outlined'
                             error={errors.pswd ? true : false}
                             helperText={errors.pswd?.message}
+                            autoComplete='current-password'
                             fullWidth required
                         /> 
                     )}
                 />
                 <a href='/register'>Don't have an account?</a>
+                <a href='/forgot-password'>Forgot your password?</a>
                 <footer>
                     <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
-                    <Button variant='contained' type='submit' disabled={!isDirty || !isValid} >Login</Button>
+                    <Button variant='contained' type='submit' disabled={!isDirty || !isValid} data-testid='login-button'>Login</Button>
                 </footer>
             </Paper> 
         </form>
