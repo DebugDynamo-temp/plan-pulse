@@ -17,13 +17,15 @@ public class TaskController {
 
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable String id) {
-        return taskService.getTaskById(id);
+    public Task getTaskById(@PathVariable String id, Authentication authentication) {
+        String requesterId = authentication.getName();
+        return taskService.getTaskById(id, requesterId);
     }
 
     @GetMapping("/board/{boardId}")
-    public List<Task> getTasksByBoard(@PathVariable String boardId) {
-        return taskService.getTasksByBoard(boardId);
+    public List<Task> getTasksByBoard(@PathVariable String boardId, Authentication authentication) {
+        String requesterId = authentication.getName();
+        return taskService.getTasksByBoard(boardId, requesterId);
     }
 
     @PutMapping("/{taskId}/status")
@@ -33,7 +35,8 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/time")
-    public Task trackTime(@PathVariable String taskId, @RequestBody long minutes) {
-        return taskService.trackTime(taskId, minutes);
+    public Task trackTime(@PathVariable String taskId, @RequestBody long minutes, Authentication authentication) {
+        String requesterId = authentication.getName();
+        return taskService.trackTime(taskId, minutes, requesterId);
     }
 }

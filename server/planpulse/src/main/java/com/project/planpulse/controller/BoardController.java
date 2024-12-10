@@ -29,8 +29,9 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public Board getBoardById(@PathVariable String id) {
-        return boardService.getBoardById(id);
+    public Board getBoardById(@PathVariable String id, Authentication authentication) {
+        String requesterId = authentication.getName();
+        return boardService.getBoardById(id, requesterId);
     }
 
     @PostMapping("/add-user/{boardId}/{identifier}")
