@@ -28,7 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll() // unauthenticated access to /auth/** endpoints
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow all pre-flight requests
                         .anyRequest().authenticated() // needs authentication for all other endpoints
-                ).addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, e) -> {
                             res.setContentType("application/json");
