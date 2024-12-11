@@ -120,7 +120,6 @@ async function updateTaskTime(taskID, time){
 }
 
 async function updateTaskStatus(taskID, status){
-    console.log(taskID);
     try {
         let result = await fetch(`${url}/tasks/${taskID}/status`, {
             method: 'PUT',
