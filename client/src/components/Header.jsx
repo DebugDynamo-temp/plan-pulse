@@ -28,10 +28,12 @@ function Header(){
 
     useEffect(() => {
         async function loadImage(){
-            let loadedImg = await getProfileImg();
-            if(loadedImg.success){
-                let res = URL.createObjectURL(loadedImg.img);
-                setImg(res);
+            if(profileImg && profileImg.length > 0){
+                let loadedImg = await getProfileImg();
+                if(loadedImg.success){
+                    let res = URL.createObjectURL(loadedImg.img);
+                    setImg(res);
+                }
             }
         }
 

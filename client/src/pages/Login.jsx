@@ -40,7 +40,7 @@ function Login() {
     }
 
     return ( 
-        <form className="authForm" onSubmit={handleSubmit(submit)}>
+        <form className="authForm" onSubmit={handleSubmit(async (data) => await submit(data) )}>
             <Paper id="paper">
                 <Typography variant='h2'>Sign In</Typography>
                 <Controller

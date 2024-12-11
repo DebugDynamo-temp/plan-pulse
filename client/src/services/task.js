@@ -1,6 +1,9 @@
-const headers = new Headers({
-    'Content-type': 'application/json'
-})
+function getHeader(){
+    return  new Headers({
+        'Content-type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem("JWT-TOKEN")}`
+    })
+}
 
 const url = import.meta.env.VITE_BACKEND_URL;
 
@@ -9,7 +12,7 @@ async function createTask(task, boardID){
         let result = await fetch(`${url}/boards/add-task/${boardID}`, {
             method: 'POST',
             credentials: 'include',
-            headers: headers,
+            headers: getHeader(),
             body: JSON.stringify(task)
         })
 
@@ -37,7 +40,7 @@ async function getTaskById(taskID){
         let result = await fetch(`${url}/tasks/${taskID}`, {
             method: 'GET',
             credentials: 'include',
-            headers: headers,
+            headers: getHeader(),
         })
 
         if(result.status >= 400 && result.status < 500){
@@ -66,7 +69,7 @@ async function getTasksByBoard(boardID){
         let result = await fetch(`${url}/tasks/board/${boardID}`, {
             method: 'GET',
             credentials: 'include',
-            headers: headers,
+            headers: getHeader(),
         })
 
         if(result.status >= 400 && result.status < 500){
@@ -94,7 +97,7 @@ async function updateTaskTime(taskID, time){
         let result = await fetch(`${url}/tasks/${taskID}/time`, {
             method: 'POST',
             credentials: 'include',
-            headers: headers,
+            headers: getHeader(),
             body: time 
         })
 
@@ -117,12 +120,11 @@ async function updateTaskTime(taskID, time){
 }
 
 async function updateTaskStatus(taskID, status){
-    console.log(taskID);
     try {
         let result = await fetch(`${url}/tasks/${taskID}/status`, {
             method: 'PUT',
             credentials: 'include',
-            headers: headers,
+            headers: getHeader(),
             body: status
         })
 

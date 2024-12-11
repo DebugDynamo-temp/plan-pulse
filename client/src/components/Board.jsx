@@ -26,10 +26,11 @@ function Board({ board }){
 
 	async function addCollab(identifier){
 		let res = await addCollaborator(board.id, identifier);
-		console.log(res);
 		if(!res.success){
 			alert("Failed to add collaborator");
 		}
+
+		await loadCollaborators();
 	}
 
 	async function addTask(newTask){
@@ -53,12 +54,37 @@ function Board({ board }){
 		}
 	}
 	
-	function changeStatus(task, idx){
+	/*function changeStatus(task, idx){
 		console.log(displayTasks);
 		let tasksCopy = displayTasks.toSpliced(idx, 1);
 		tasksCopy.push(task);
 		setTasks(tasksCopy)
 		console.log(displayTasks);
+	}*/
+
+	async function changeStatus(){
+		let tasks = await getTasksByBoard(board.id); 
+		if(tasks.success){
+			setTasks(tasks.tasks);
+		}
+	}
+
+	async function loadCollaborators(){
+		if(board.id){
+			console.log(board.type);
+			let collabs = await getCollaboratorNames(board.id);	
+			if(collabs.success){
+				let cs = [];
+				collabs.collaborators.map((c, idx) => {
+					cs.push({
+						name: c,
+						id: board.collaboratorIds[idx]
+					})
+				})
+
+				setCollaborators(cs);
+			}
+		}
 	}
 
 	useEffect(() => {
@@ -69,22 +95,6 @@ function Board({ board }){
 			}
 		}
 
-		async function loadCollaborators(){
-			if(board.id){
-				let collabs = await getCollaboratorNames(board.id);	
-				if(collabs.success){
-					let cs = [];
-					collabs.collaborators.map((c, idx) => {
-						cs.push({
-							name: c,
-							id: board.collaboratorIds[idx]
-						})
-					})
-
-					setCollaborators(cs);
-				}
-			}
-		}
 
 		loadCollaborators();
 		loadTasks();
