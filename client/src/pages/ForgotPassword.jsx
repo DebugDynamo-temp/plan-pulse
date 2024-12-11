@@ -78,7 +78,7 @@ function ForgotPassword(){
                         )}
                     />
                     <footer>
-                        <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
+                        <Button variant='outlined' onClick={() => { nav('/home')}}>Cancel</Button>
                         <Button variant='contained' type='submit' disabled={!isDirty || !isValid}>Send Password Reset</Button>
                     </footer>
                 </Paper> 

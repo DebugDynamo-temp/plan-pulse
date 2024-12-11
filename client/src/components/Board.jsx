@@ -7,9 +7,10 @@ import Task from "./Task";
 import { createTask, getTasksByBoard } from "../services/task";
 import CollaboratorDialog from "./CollaboratorDialog";
 import { addCollaborator } from "../services/board";
+import { Typography } from "@mui/material";
 
 function Board({ board }){
-	const { user } = useContext(UserContext);
+	const { id } = useContext(UserContext);
 	const [openCreateTask, setOpenCreateTask] = useState(false);
 	const [openCollaborator, setOpenCollaborator] = useState(false);
 	const [displayTasks, setTasks] = useState([]);
@@ -35,14 +36,16 @@ function Board({ board }){
 		newTask.startTime = new Date();
 		newTask.endTime = new Date();
 		newTask.startTime = new Date();
-		newTask.reporterId = user.id;
+		newTask.reporterId = id;
 		newTask.timeSpent = 0;
 		if(board.type === 'PRIVATE'){
-			newTask.assignee = user.id;
+			newTask.assignee = id;
 		}
 
 		let res = await createTask(newTask, board.id);
 		if(res.success){
+			console.log(res.task)
+			newTask.id = res.task.id;
 			setTasks([...displayTasks, newTask]);
 		} else {
 			alert("Error Creating Task");
@@ -50,15 +53,19 @@ function Board({ board }){
 	}
 	
 	function changeStatus(task, idx){
+		console.log(displayTasks);
 		let tasksCopy = displayTasks.toSpliced(idx, 1);
 		tasksCopy.push(task);
 		setTasks(tasksCopy)
+		console.log(displayTasks);
 	}
 
 	useEffect(() => {
 		async function loadTasks() {
-			let tasks = await getTasksByBoard(board.id);
-			setTasks(tasks.tasks);
+			if(board.id){
+				let tasks = await getTasksByBoard(board.id);
+				setTasks(tasks.tasks);
+			}
 		}
 
 		loadTasks();
@@ -67,7 +74,7 @@ function Board({ board }){
 	return (
 		<>
 			<header>
-				<h1>{board.title}</h1>
+				<Typography variant="h2">{board.title}</Typography>
 				{ board.type === 'PUBLIC' ?
 				<Button
 					variant="contained"
@@ -89,11 +96,11 @@ function Board({ board }){
 				{status.map((s) => {
 					return (
 						<div className={s.toLowerCase()} key={`${s}-container`}>
-							<h3>{ statusToReadable(s) }</h3>
+							<Typography variant='h5'>{ statusToReadable(s) }</Typography>
 							{displayTasks ? displayTasks.filter((t) => {
 								return t.status === s;
 							}).map((t, idx) => {
-								return <Task task={t} key={t.title} idx={idx} onStatusChange={() => { changeStatus(t) }} />
+								return <Task task={t} key={`${t.title}-${idx}` } idx={idx} onStatusChange={() => { changeStatus(t) }} />
 							}) : ''}
 						</div>
 					)

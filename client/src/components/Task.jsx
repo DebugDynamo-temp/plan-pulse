@@ -7,6 +7,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import parse from 'html-react-parser';
 import { updateTaskStatus } from "../services/task";
 import { useNavigate } from "react-router-dom";
+import { Typography } from "@mui/material";
 
 function Task({ task, idx, onStatusChange }){
 	const nav = useNavigate();
@@ -41,7 +42,7 @@ function Task({ task, idx, onStatusChange }){
 			<AccordionSummary
 				expandIcon={<ExpandMoreIcon className={`priority-${task.priority}`} />}
 			>
-				{task.title}
+				<Typography variant="h5">{task.title}</Typography>
 			</AccordionSummary>
 			<AccordionDetails>
 				{parse(task.description)} 

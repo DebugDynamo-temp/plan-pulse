@@ -6,8 +6,13 @@ const theme = createTheme({
 		primary: blue, 
 		secondary: {
 			main: pink[300]
+		},
+		white: {
+			main: '#eee',
+			pink: pink[50],
+			blue: blue[50]
 		}
-	}
+	},
 });
 
 export { theme }

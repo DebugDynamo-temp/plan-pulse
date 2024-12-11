@@ -1,12 +1,13 @@
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import Paper from "@mui/material/Paper";
+import { Typography } from "@mui/material";
 
 function Landing(){
     return (
       <Paper elevation={3} className="landing">
-        <h3>Elevate your time management with:</h3>
-        <h1>PlanPulse</h1>
+        <Typography variant="h5">Elevate your time management with:</Typography>
+        <Typography variant="h1" sx={{ fontSize: '3em', marginTop: '10%' }}>PlanPulse</Typography>
         <footer>
           <Button component={Link} to="/register" variant="contained" color="secondary">
             Sign Up

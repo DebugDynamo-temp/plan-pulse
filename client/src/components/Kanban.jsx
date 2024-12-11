@@ -7,7 +7,7 @@ function Kanban(){
     return (
         <>
             <section>
-                <Board board={currentBoard ? currentBoard : { title: '' }} />
+                <Board board={currentBoard ? currentBoard : { title: 'No boards yet! Click the + to create one' }} />
             </section>
         </>
     )

@@ -11,7 +11,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
 import { theme } from './contexts/Theme';
 import Kanban from './components/Kanban';
-import NotFound from './pages/NotFound';
+import Error from './pages/Error';
 import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
@@ -29,7 +29,8 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path='/not-authed' element={<Error msg={"Something went wrong."} />} />
+          <Route path="*" element={<Error msg="404 Page not found." />} />
         </Routes>
       </UserProvider>
     </ThemeProvider>

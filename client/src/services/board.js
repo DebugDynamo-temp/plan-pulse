@@ -2,9 +2,11 @@ const headers = new Headers({
     'Content-type': 'application/json'
 })
 
+const url = import.meta.env.VITE_BACKEND_URL;
+
 async function getBoards(){
     try {
-        let response = await fetch('http://localhost:8080/boards/all', {
+        let response = await fetch(`${url}/boards/all`, {
             method: 'GET',
             headers: headers,
             credentials: 'include'
@@ -32,7 +34,7 @@ async function getBoards(){
 
 async function getBoardByID(boardID){
     try {
-        let response = await fetch(`http://localhost:8080/boards/${boardID}`, {
+        let response = await fetch(`${url}/boards/${boardID}`, {
             method: 'GET',
             credentials: 'include',
             headers: headers,
@@ -60,7 +62,7 @@ async function getBoardByID(boardID){
 }
 async function createBoard(board){
     try {
-        let response = await fetch(`http://localhost:8080/boards/create-board`, {
+        let response = await fetch(`${url}/boards/create-board`, {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify(board),
@@ -89,7 +91,7 @@ async function createBoard(board){
 
 async function addCollaborator(boardID, identifier){
     try {
-        let response = await fetch(`http://localhost:8080/boards/add-user/${boardID}/${identifier}`, {
+        let response = await fetch(`${url}/boards/add-user/${boardID}/${identifier}`, {
             method: 'POST',
             credentials: 'include',
             body: '',

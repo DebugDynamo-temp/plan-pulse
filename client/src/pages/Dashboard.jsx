@@ -5,18 +5,18 @@ import Header from "../components/Header";
 import { createBoard, getBoards } from "../services/board";
 import { getUser } from "../services/user";
 import CreateBoardDialog from "../components/CreateBoardDialog";
+import { Button, ButtonGroup, Divider } from "@mui/material";
 
 function Dashboard(){
-	const { user, setUser } = useContext(UserContext);
-	const [authorized, setAuthorized] = useState(false);
+	const { id, updateUser } = useContext(UserContext);
 	const [openCreateBoard, setOpenCreateBoard] = useState(false);
 	const nav = useNavigate();
 	const [boards, setBoards] = useState([]);
 	const [currentBoard, setCurrentBoard] = useState(boards[0]);
 
 	async function addBoard(newBoard){
-		newBoard.creatorId = user.id;
-		newBoard.collaboratorIds.push(user.id);
+		newBoard.creatorId = id;
+		newBoard.collaboratorIds.push(id);
 		newBoard.type = newBoard.type.toUpperCase();
 		let res = await createBoard(newBoard);
 		if(res.success){
@@ -29,17 +29,19 @@ function Dashboard(){
 
 	useEffect(() => {
 		async function loadUser(){
-			let user = await getUser();
-			setUser({
-				id: user.id,
-				email: user.email,
-				uname: user.uname
-			})
+			let loadedUser = await getUser();
+			if(!loadedUser.success){
+				nav('/not-authed');
+				return;
+			}
+			updateUser(loadedUser);
 
 			let res = await getBoards();
 			if(res.success){
-				setBoards(res.boards);
-				setCurrentBoard(res.boards[0]);
+				if(res.boards.length > 0){
+					setBoards(res.boards);
+					setCurrentBoard(res.boards[0]);
+				}
 			} else {
 				alert("Error loading boards");
 			}
@@ -53,19 +55,27 @@ function Dashboard(){
 			<Header />
 			<main>
 				<aside>
-					{boards.map((b) => {
-						return (
-							<p 
-								key={`${b.title}`}
-								className={b === currentBoard ? 'selected' : ''}	
-								onClick={(e) => {
-									setCurrentBoard(b);
-									nav('/home');
-								}}
-							>{ b.title }</p>
-						)
-					})}
-					<p onClick={() => {setOpenCreateBoard(true)}}>+</p>
+					<div className="buttonGroup">
+						<ButtonGroup orientation="vertical" variant="contained" size="large" disableElevation sx={{ width: '90%' }} >
+							{boards.map((b) => {
+								return (
+									<Button
+										key={`${b.title}`}
+										color={b === currentBoard ? 'secondary' : 'primary'}
+										className={currentBoard === b ? 'selected' : ''}
+										sx={{ textTransform: 'none', fontSize: 'large' }}
+										onClick={(e) => {
+											setCurrentBoard(b);
+											nav('/home');
+										}}
+										fullWidth
+									>{ b.title }</Button>
+								)
+							})}
+							<Button onClick={() => {setOpenCreateBoard(true)}} color='info' value={''} fullWidth>+</Button>
+						</ButtonGroup>
+						<Divider orientation="vertical" flexItem sx={{ maxheight: '80%', marginTop: '10%', marginLeft: '10%' }} />
+					</div>
 				</aside>
 				<Outlet context={currentBoard} />
 				<CreateBoardDialog open={openCreateBoard} close={() => setOpenCreateBoard(false)} addBoard={addBoard}/>
