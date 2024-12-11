@@ -4,6 +4,8 @@ import com.project.planpulse.model.Board;
 import com.project.planpulse.model.Task;
 import com.project.planpulse.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,13 @@ public class BoardController {
 
     @Autowired
     private BoardService boardService;
+
+    @GetMapping("/collaborators/{boardId}")
+    public ResponseEntity<List<String>> getCollaborators(@PathVariable String boardId, Authentication authentication) {
+        String requesterId = authentication.getName();
+        List<String> collaboratorUsernames = boardService.getCollaboratorUsernames(boardId, requesterId);
+        return ResponseEntity.ok(collaboratorUsernames);
+    }
 
     @GetMapping("/all")
     public List<Board> getBoardsForUser(Authentication authentication) {

@@ -18,6 +18,7 @@ public class Board {
     private String id;
     private String title;
     private String type = "PUBLIC"; // PRIVATE or PUBLIC
+    @Indexed
     private String creatorId;
     @Indexed
     private List<String> collaboratorIds = new ArrayList<>(); // Users who can modify tasks
