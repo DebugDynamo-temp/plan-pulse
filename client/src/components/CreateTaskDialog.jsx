@@ -11,11 +11,11 @@ import Slider from "@mui/material/Slider";
 import { status, statusToReadable } from "../services/utils";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
+import { Typography } from "@mui/material";
 
 function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborators }){
 	const init = {
 		title: 'New Task',
-		description: '',
 		assignee: '',
 		priority: 3,
 		status: "TO_DO",
@@ -24,6 +24,7 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 	const [statusCollection, setStatus] = useState(status)
 	const [isOpen, setIsOpen] = useState(open);
 	const [newTask, setNewTask] = useState(init);
+	const [desc, setDesc] = useState('');
 
 	function handleClose(){
 		setIsOpen(false);
@@ -44,6 +45,7 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 				component: 'form',
 				onSubmit: (e) => {
 					e.preventDefault();
+					newTask.description = desc;
 					addTask(newTask);
 					handleClose();
 				}
@@ -51,56 +53,60 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 			maxWidth="md"
 			fullWidth
 		>
-			<DialogTitle>{ newTask.title }</DialogTitle>	
+			<DialogTitle variant="h3">
+				{ newTask.title }
+			</DialogTitle>	
 			<DialogContent className="createTask">
 				<div>
-					<h4>Task Title</h4>
+					<Typography variant="h6">Task Title</Typography>
 					<TextField
 						id="taskTitle"
 						type="text"
 						value={newTask.title}
 						variant="outlined"
 						onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-						onFocus={(e) => e.target.select()}
 						fullWidth
 						autoFocus
 					/>
 				</div>
 
 				<div>
-					<h4>Description</h4>
-					<Editor onChange={(desc) => setNewTask({...newTask, description: desc})} />
+					<Typography variant="h6">Description</Typography>
+					<Editor onChange={(desc) => setDesc(desc)} />
+				</div>
+
+				<div className="statusPriority">
+					<section>
+						<Typography variant="h6">Status</Typography>
+						<FormControl fullWidth>
+							<Select 
+								value={newTask.status}
+								id="status-select"
+								onChange={(e) => setNewTask({...newTask, status: e.target.value})}
+							>
+								{statusCollection.map((s, idx) => {
+									return <MenuItem key={`${s}-${idx}`} value={s}>{statusToReadable(s)}</MenuItem>
+								})}
+							</Select>
+						</FormControl>
+					</section>
+					<section>
+						<Typography variant="h6">Priority</Typography>
+						<Slider
+							value={newTask.priority}
+							min={1}
+							max={10}
+							step={1}
+							valueLabelDisplay="auto"
+							onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
+							marks
+						/>
+
+					</section>
 				</div>
 
 				<div>
-					<h4>Status</h4>
-					<FormControl fullWidth>
-						<Select 
-							value={newTask.status}
-							id="status-select"
-							onChange={(e) => setNewTask({...newTask, status: e.target.value})}
-						>
-							{statusCollection.map((s, idx) => {
-								return <MenuItem key={`${s}-${idx}`} value={s}>{statusToReadable(s)}</MenuItem>
-							})}
-						</Select>
-					</FormControl>
-				</div>
-
-				<div>
-					<h4>Priority</h4>
-					<Slider
-						value={newTask.priority}
-						min={1}
-						max={10}
-						step={1}
-						valueLabelDisplay="auto"
-						onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
-						marks
-					/>
-				</div>
-				<div>
-					<h4>Deadline</h4>
+					<Typography variant="h6">Deadline</Typography>
 					<input 
 						type="datetime-local" 
 						value={newTask.deadline} 
@@ -111,7 +117,7 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 				{
 					showCollaborators ? 
 					<div>
-						<h4>Assign To:</h4>
+						<Typography variant="h6">Assign To</Typography>
 						<FormControl fullWidth>
 							<Select 
 								value={newTask.assignee}

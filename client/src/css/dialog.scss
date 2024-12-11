@@ -1,6 +1,15 @@
-.content {
+.createTask {
 	& > div {
-		margin-top: 5%;
+		margin-top: 2%;
+	}
+
+	.statusPriority {
+		display: flex;
+		justify-content: space-between;
+
+		section {
+			width: 45%;
+		}
 	}
 
 	.editor {

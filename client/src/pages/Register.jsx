@@ -6,6 +6,7 @@ import { useContext } from 'react';
 import User from '../contexts/User';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../services/auth';
+import { Typography } from '@mui/material';
 
 function Register() {
     const nav = useNavigate();
@@ -46,7 +47,7 @@ function Register() {
     return ( 
         <form className="authForm" onSubmit={handleSubmit(submit)}>
             <Paper id="paper">
-                <h1>Sign Up:</h1>
+                <Typography variant='h2'>Sign Up</Typography>
                 <Controller
                     name="fname"
                     control={control}
@@ -61,7 +62,8 @@ function Register() {
                             variant='outlined' 
                             error={errors.fname ? true : false} 
                             helperText={errors.fname?.message}
-                            fullWidth required 
+                            sx={{ width: '49%', marginRight: '2%' }}
+                            required 
                         /> 
                     )}
                 />
@@ -79,7 +81,8 @@ function Register() {
                             variant='outlined' 
                             error={errors.lname ? true : false} 
                             helperText={errors.lname?.message}
-                            fullWidth required 
+                            sx={{ width: '49%' }}
+                            required 
                         /> 
                     )}
                 />

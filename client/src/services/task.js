@@ -2,9 +2,11 @@ const headers = new Headers({
     'Content-type': 'application/json'
 })
 
+const url = import.meta.env.VITE_BACKEND_URL;
+
 async function createTask(task, boardID){
     try {
-        let result = await fetch(`http://localhost:8080/boards/add-task/${boardID}`, {
+        let result = await fetch(`${url}/boards/add-task/${boardID}`, {
             method: 'POST',
             credentials: 'include',
             headers: headers,
@@ -20,7 +22,7 @@ async function createTask(task, boardID){
         result = await result.json();
         return {
             success: true,
-            result: result
+            task: result
         }
     } catch(e){
         return {
@@ -32,7 +34,7 @@ async function createTask(task, boardID){
 
 async function getTaskById(taskID){
     try {
-        let result = await fetch(`http://localhost:8080/tasks/${taskID}`, {
+        let result = await fetch(`${url}/tasks/${taskID}`, {
             method: 'GET',
             credentials: 'include',
             headers: headers,
@@ -61,7 +63,7 @@ async function getTaskById(taskID){
 
 async function getTasksByBoard(boardID){
     try {
-        let result = await fetch(`http://localhost:8080/tasks/board/${boardID}`, {
+        let result = await fetch(`${url}/tasks/board/${boardID}`, {
             method: 'GET',
             credentials: 'include',
             headers: headers,
@@ -89,7 +91,7 @@ async function getTasksByBoard(boardID){
 
 async function updateTaskTime(taskID, time){
     try {
-        let result = await fetch(`http://localhost:8080/tasks/${taskID}/time`, {
+        let result = await fetch(`${url}/tasks/${taskID}/time`, {
             method: 'POST',
             credentials: 'include',
             headers: headers,
@@ -115,9 +117,10 @@ async function updateTaskTime(taskID, time){
 }
 
 async function updateTaskStatus(taskID, status){
+    console.log(taskID);
     try {
-        let result = await fetch(`http://localhost:8080/tasks/${taskID}/status`, {
-            method: 'POST',
+        let result = await fetch(`${url}/tasks/${taskID}/status`, {
+            method: 'PUT',
             credentials: 'include',
             headers: headers,
             body: status

@@ -1,13 +1,14 @@
 import Cookies from 'js-cookie';
 
+const url = import.meta.env.VITE_BACKEND_URL;
+
 const jsonContentType = new Headers({
     'Content-Type': 'application/json'
 })
 
 async function login(identifier, pswd){
-
     try {
-        let response = await fetch('http://localhost:8080/auth/login', {
+        let response = await fetch(`${url}/auth/login`, {
             method: "POST",
             body: JSON.stringify({
                 identifier: identifier,
@@ -46,7 +47,7 @@ async function register(first, last, email, uname, pswd, confirmPswd){
     formData.append('profileImage', '');
 
     try {
-        let response = await fetch('http://localhost:8080/auth/register', {
+        let response = await fetch(`${url}/auth/register`, {
             method: "POST",
             body: formData 
         })
@@ -74,7 +75,7 @@ async function register(first, last, email, uname, pswd, confirmPswd){
 
 async function logout(){
     try {
-        let response = await fetch('http://localhost:8080/auth/logout', {
+        let response = await fetch(`${url}/auth/logout`, {
             method: 'POST',
             credentials: 'include'
         }) 
@@ -96,7 +97,7 @@ async function logout(){
 
 async function forgotPassword(email){
     try {
-        let response = await fetch('http://localhost:8080/auth/logout', {
+        let response = await fetch(`${url}/auth/logout`, {
             method: 'POST',
             body: JSON.stringify({
                 email: email

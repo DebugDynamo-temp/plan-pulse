@@ -11,12 +11,12 @@ import { logout } from "../services/auth";
 
 function Header(){
     const nav = useNavigate();
-	const { user, setUser } = useContext(UserContext);
+	const { username, clearUser } = useContext(UserContext);
 	const [anchorEl, setAnchorEl] = useState(null);
 
     async function signOut(){
         let res = await logout();
-        setUser(null);
+        clearUser()
         if(res.success){
             nav('/');
         } else {
@@ -31,7 +31,7 @@ function Header(){
                     PlanPulse	
                 </Typography>
                 <Typography variant="h6" component="div">
-                    { user.uname }
+                    { username }
                 </Typography>
                 <IconButton
                     onClick={(e) => setAnchorEl(e.currentTarget)}

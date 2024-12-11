@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import CustomSnackbar from '../components/Snackbar';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useContext } from 'react';
@@ -7,10 +6,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import UserContext from '../contexts/User';
 import { login } from '../services/auth';
+import { Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 function Login() {
     const nav = useNavigate();
-    const { setUser } = useContext(UserContext);
+    const palette = useTheme().palette;
 
     const { 
         control, 
@@ -41,7 +42,7 @@ function Login() {
     return ( 
         <form className="authForm" onSubmit={handleSubmit(submit)}>
             <Paper id="paper">
-                <h1>Sign In:</h1>
+                <Typography variant='h2'>Sign In</Typography>
                 <Controller
                     name="identifier"
                     control={control}
@@ -53,7 +54,8 @@ function Login() {
                             onChange={onChange}
                             id='identifier' 
                             label='Email/Username' 
-                            variant='outlined' 
+                            variant='outlined'
+                            color='secondary'
                             error={errors.email ? true : false} 
                             helperText={errors.email?.message}
                             autoComplete='username'
