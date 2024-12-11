@@ -2,8 +2,6 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import { useForm, Controller } from 'react-hook-form';
-import { useContext } from 'react';
-import User from '../contexts/User';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../services/auth';
 import { Typography } from '@mui/material';
@@ -32,12 +30,10 @@ function Register() {
         }
     });
     const pswd = watch('pswd', '');
-    const { user, setUser } = useContext(User);
 
     async function submit(data, e){
         let res = await register(data.fname, data.lname, data.email, data.uname, data.pswd, data.confirmPswd);
         if(res.success){
-            setUser(res.user.userId);
             nav('/home');
         } else {
             alert('Registration failed');

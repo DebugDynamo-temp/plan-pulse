@@ -11,9 +11,11 @@ import Slider from "@mui/material/Slider";
 import { status, statusToReadable } from "../services/utils";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
+import { useContext } from "react";
+import UserContext from "../contexts/User";
 import { Typography } from "@mui/material";
 
-function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborators }){
+function CreateTaskDialog({ open, close, addTask, creatorName, collaborators, showCollaborators }){
 	const init = {
 		title: 'New Task',
 		assignee: '',
@@ -21,6 +23,7 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 		status: "TO_DO",
 		deadline: ''
 	}
+	const { userId, username } = useContext(UserContext);
 	const [statusCollection, setStatus] = useState(status)
 	const [isOpen, setIsOpen] = useState(open);
 	const [newTask, setNewTask] = useState(init);
@@ -127,6 +130,7 @@ function CreateTaskDialog({ open, close, addTask, collaborators, showCollaborato
 								{collaborators.map((c, idx) => {
 									return <MenuItem key={`c-${idx}`} value={c}>{c}</MenuItem>
 								})}
+								<MenuItem value={userId}>{username}</MenuItem>
 							</Select>
 						</FormControl>
 					</div> : ''

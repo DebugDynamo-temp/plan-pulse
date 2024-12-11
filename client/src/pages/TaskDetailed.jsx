@@ -7,8 +7,8 @@ import Timer from "../components/Timer";
 import Typography from "@mui/material/Typography";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { pink } from "@mui/material/colors";
 import { getTaskById } from '../services/task';
+import GaugeComponent from 'react-gauge-component';
 
 function TaskDetailed(){
 	const params = useParams();
@@ -19,6 +19,49 @@ function TaskDetailed(){
 		priority: 1,
 		timeSpent: 0
 	});
+	
+	const subArcs = [
+		{
+			limit: 1,
+			color: '#00FF00',
+		},
+		{
+			limit: 2,
+			color: '#33FF00',
+		},
+		{
+			limit: 3,
+			color: '#66FF00',
+		},
+		{
+			limit: 4,
+			color: '#99FF00',
+		},
+		{
+			limit: 5,
+			color: '#CCFF00',
+		},
+		{
+			limit: 6,
+			color: '#FFCC00',
+		},
+		{
+			limit: 7,
+			color: '#FF9900',
+		},
+		{
+			limit: 8,
+			color: '#FF6600',
+		},
+		{
+			limit: 9,
+			color: '#FF3300',
+		},
+		{
+			limit: 10,
+			color: '#FF0000',
+		}
+	]
 	const marks = [
 		{
 			value: 0,
@@ -45,7 +88,6 @@ function TaskDetailed(){
 	useEffect(() => {
 		async function loadTask(){
 			let res = await getTaskById(params.id);
-			console.log(res.task.deadline, new Date(res.task.deadline));
 			setTask({...res.task, deadline: new Date(res.task.deadline)});
 		}
 
@@ -54,7 +96,7 @@ function TaskDetailed(){
 
 	return (
 		<section className="taskDetailed">
-			<Card variant="elevation" id="desc" sx={{ bgcolor: pink['50'] }}>
+			<Card variant="elevation" id="desc">
 				<CardContent>
 					<Typography variant='h2'>
 						{task.title}
@@ -63,7 +105,7 @@ function TaskDetailed(){
 				</CardContent>
 			</Card>
 
-			<Card variant="elevation" id="deadline" sx={{ bgcolor: pink['50'] }}>
+			<Card variant="elevation" id="deadline">
 				<CardContent>
 					<Typography variant='h3'>
 						Deadline	
@@ -78,25 +120,48 @@ function TaskDetailed(){
 				</CardContent>
 			</Card>
 
-			<Card variant="elevation" sx={{ padding: '10px' }} id="status" className={`p-${task.priority}`}>
+			<Card variant="elevation" sx={{ padding: '10px' }} id="status">
 				<CardContent>
-					<Typography variant='h3'>
+					<Typography variant='h5'>
 						Status	
 					</Typography>
 					<Slider
 						marks={marks}
 						min={0}
 						max={3}
-						sx={{ pointerEvents: "none" }}
+						sx={{ pointerEvents: "none", width: '80%' }}
 						value={["TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE"].indexOf(task.status)}
 					/>
-					<p>Assigned To: {task.assigneeId}</p>
 				</CardContent>
 			</Card>
 
-			<Card variant="elevation" id="deadline" sx={{ bgcolor: pink['50'] }}>
+			<Card variant="elevation">
 				<CardContent>
-					<Typography variant='h4'>Total Minutes Spent</Typography>
+					<Typography variant='h5'>
+						Priority	
+					</Typography>
+					<GaugeComponent 
+						type='semicircle'
+						minValue={0}
+						maxValue={10} 
+						value={task.priority}
+						arc={{
+							subArcs: subArcs,
+							gradient: true,
+							padding: 0
+						}}
+						labels={{
+							valueLabel: {
+								matchColorWithArc: true,
+							} 
+						}}
+					/>
+				</CardContent>
+			</Card>
+
+			<Card variant="elevation">
+				<CardContent>
+					<Typography variant='h5'>Total Minutes Spent</Typography>
 					<Typography variant='h2'>{task.timeSpent}</Typography>
 				</CardContent>
 			</Card>

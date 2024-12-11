@@ -8,7 +8,7 @@ const UserProvider = ({ children }) => {
 	const [userId, setId] = useState('');
 	const [username, setUname] = useState('');
 	const [userEmail, setEmail] = useState('');
-	const [isAuthed, setIsAuthed] = useState(false);
+	const [profileImg, setProfileImg] = useState('');
 
 	function updateUser(data){
 		if(data.first){
@@ -26,6 +26,9 @@ const UserProvider = ({ children }) => {
 		if(data.uname){
 			setUname(data.uname);	
 		}
+		if(data.img){
+			setProfileImg(data.img);
+		}
 	}
 
 	function clearUser(){
@@ -34,10 +37,11 @@ const UserProvider = ({ children }) => {
 		setId('');
 		setEmail('');
 		setUname('');
+		setProfileImg('');
 	}
 
 	return (
-		<UserContext.Provider value={{ userFirst, userLast, userId, userEmail, username, updateUser, clearUser }}>
+		<UserContext.Provider value={{ userFirst, userLast, userId, userEmail, username, profileImg, updateUser, clearUser }}>
 			{children}
 		</UserContext.Provider>
 	)

@@ -1,3 +1,5 @@
+import CollaboratorDialog from "../components/CollaboratorDialog";
+
 const headers = new Headers({
     'Content-type': 'application/json'
 })
@@ -60,6 +62,7 @@ async function getBoardByID(boardID){
         }
     }
 }
+
 async function createBoard(board){
     try {
         let response = await fetch(`${url}/boards/create-board`, {
@@ -115,9 +118,38 @@ async function addCollaborator(boardID, identifier){
     }
 }
 
+async function getCollaboratorNames(boardID){
+    try {
+        let response = await fetch(`${url}/boards/collaborators/${boardID}/`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: headers
+        })
+
+        if(response.status >= 400 && response.status < 500){
+            throw "Authentication error";
+        } else if(response.status < 600 && response.status >= 500){
+            throw "Server error";
+        }
+
+        console.log(response);
+
+        return {
+            success: true,
+            collaborators: response
+        }
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
+}
+
 export {
     addCollaborator,
     createBoard,
+    getCollaboratorNames,
     getBoardByID,
     getBoards
 }

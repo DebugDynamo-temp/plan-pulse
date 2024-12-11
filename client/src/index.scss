@@ -37,10 +37,10 @@ html, body {
     main {
         display: flex;
         background-color: #fce9ef;
+        height: calc(100vh - 64px);
 
         aside {
             width: 10%;
-            height: calc(100vh - 64px);
             padding: 2% 5px;
 
             .buttonGroup {
@@ -67,7 +67,7 @@ html, body {
             &.taskDetailed {
                 display: grid;
                 padding: 10px;
-                height: calc(100vh - 85px);
+                height: calc(85vh);
                 grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(3, 1fr);
                 gap: 10px 10px;
@@ -93,17 +93,10 @@ html, body {
                     justify-content: center;
                     flex-direction: column;
                     align-items: center;
-                    grid-column: span 3;
+                    grid-column: span 2;
 
                     span {
                         font-size: 3em;
-                    }
-                }
-
-                @each $p in $priorities {
-                    $i: index($priorities, $p);
-                    .p-#{$i} {
-                        background-color: $p;
                     }
                 }
             }
