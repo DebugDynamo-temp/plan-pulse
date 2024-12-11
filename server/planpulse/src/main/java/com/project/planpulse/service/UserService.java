@@ -220,7 +220,6 @@ public class UserService {
         String filename = profileImageUrl.substring(UPLOAD_DIR.length());
 
         // ensure the file format is supported
-        String lowerCaseFilename = filename.toLowerCase();
         if (!hasValidImageExtension(filename)) {
             throw new RuntimeException("Unsupported file format: " + filename);
         }
@@ -271,15 +270,10 @@ public class UserService {
             List<String> collaboratorIds = board.getCollaboratorIds();
 
             // check if the board has no other collaborators and remove the board along with tasks
-            if (collaboratorIds == null || collaboratorIds.isEmpty() || (collaboratorIds.size() == 1 && collaboratorIds.contains(userId))) {
+            if (collaboratorIds == null || collaboratorIds.isEmpty()) {
                 List<Task> tasks = taskRepository.findByBoardId(board.getId());
                 taskRepository.deleteAll(tasks);
                 boardRepository.delete(board);
-            } else {
-                // if not, then only update collaborators
-                collaboratorIds.remove(userId);
-                board.setCollaboratorIds(collaboratorIds);
-                boardRepository.save(board);
             }
         }
 
@@ -287,13 +281,14 @@ public class UserService {
         List<Board> collaboratingBoards = boardRepository.findByCollaboratorIdsContaining(userId);
         for (Board board : collaboratingBoards) {
             List<String> collaboratorIds = board.getCollaboratorIds();
-
-            // remove the user from collaborators
-            collaboratorIds.remove(userId);
+            if (collaboratorIds != null) {
+                // remove the user from collaborators
+                collaboratorIds.remove(userId);
+            }
 
             // If no collaborators and no creator remain then delete the board & tasks
             boolean noRemainingUsers = (collaboratorIds == null || collaboratorIds.isEmpty())
-                    && (board.getCreatorId() == null || board.getCreatorId().isBlank());
+                    && (board.getCreatorId() == null || !userRepository.existsById(board.getCreatorId()));
 
             if (noRemainingUsers) {
                 // delete the board & tasks

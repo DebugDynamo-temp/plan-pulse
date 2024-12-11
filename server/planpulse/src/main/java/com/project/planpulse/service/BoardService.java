@@ -7,7 +7,6 @@ import com.project.planpulse.repository.BoardRepository;
 import com.project.planpulse.repository.TaskRepository;
 import com.project.planpulse.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -113,11 +112,11 @@ public class BoardService {
 
     public List<String> getCollaboratorUsernames(String boardId, String requesterId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("No such board"));
-        validateAddPermission(board, requesterId);
         List<String> collaboratorIds = board.getCollaboratorIds();
         if (collaboratorIds == null || collaboratorIds.isEmpty()) {
             return new ArrayList<>();
         }
+        validateAddPermission(board, requesterId);
         return collaboratorIds.stream()
                 .map(
                         userId -> userRepository.findById(userId)
