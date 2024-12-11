@@ -7,8 +7,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Service
 public class EmailService {
     @Value("${app.reset-password-url}")
