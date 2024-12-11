@@ -122,14 +122,14 @@ function TaskDetailed(){
 
 			<Card variant="elevation" sx={{ padding: '10px' }} id="status">
 				<CardContent>
-					<Typography variant='h5'>
+					<Typography variant='h4'>
 						Status	
 					</Typography>
 					<Slider
 						marks={marks}
 						min={0}
 						max={3}
-						sx={{ pointerEvents: "none", width: '80%' }}
+						sx={{ pointerEvents: "none", width: '80%', marginLeft: '10%', marginTop: '5%' }}
 						value={["TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE"].indexOf(task.status)}
 					/>
 				</CardContent>
@@ -153,6 +153,7 @@ function TaskDetailed(){
 						labels={{
 							valueLabel: {
 								matchColorWithArc: true,
+								hide: true
 							} 
 						}}
 					/>

@@ -35,7 +35,12 @@ function UserProfile(){
     async function submit(data, e){
         data.img = img;
         let res = await updateUserProfile(data);
-        setOpenSnackbar(true);
+        if(res.success){
+            updateUser(res);
+            setOpenSnackbar(true);
+        } else {
+            alert("Error updating profile");
+        }
     }
 
     function closeSnackbar(){
@@ -128,11 +133,11 @@ function UserProfile(){
                     <a href={`/forgot-password?email=${userEmail}`}>Change password?</a>
                     <footer>
                         <Button variant='outlined' onClick={() => reset()}>Cancel</Button>
-                        <Button variant='contained' type='submit'>Update Email</Button>
+                        <Button variant='contained' type='submit'>Update Profile</Button>
                     </footer>
                 </Paper> 
             </form>
-            <CustomSnackbar open={openSnackbar} close={closeSnackbar} msg={"Email changed!"} />
+            <CustomSnackbar open={openSnackbar} close={closeSnackbar} msg={"Profile changed!"} />
         </section>
     )
 }

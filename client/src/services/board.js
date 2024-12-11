@@ -120,7 +120,7 @@ async function addCollaborator(boardID, identifier){
 
 async function getCollaboratorNames(boardID){
     try {
-        let response = await fetch(`${url}/boards/collaborators/${boardID}/`, {
+        let response = await fetch(`${url}/boards/collaborators/${boardID}`, {
             method: 'GET',
             credentials: 'include',
             headers: headers
@@ -132,7 +132,7 @@ async function getCollaboratorNames(boardID){
             throw "Server error";
         }
 
-        console.log(response);
+        response = await response.json();
 
         return {
             success: true,

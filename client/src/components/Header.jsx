@@ -5,14 +5,16 @@ import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Menu, MenuItem } from "@mui/material";
+import { Avatar, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../services/auth";
+import { getProfileImg } from "../services/user";
 
 function Header(){
     const nav = useNavigate();
-	const { username, clearUser } = useContext(UserContext);
+	const { username, profileImg,  clearUser } = useContext(UserContext);
 	const [anchorEl, setAnchorEl] = useState(null);
+    const [img, setImg] = useState('');
 
     async function signOut(){
         let res = await logout();
@@ -24,6 +26,17 @@ function Header(){
         }
     }
 
+    useEffect(() => {
+        async function loadImage(){
+            let loadedImg = await getProfileImg();
+            if(loadedImg.success){
+                let res = URL.createObjectURL(loadedImg.img);
+                setImg(res);
+            }
+        }
+
+        loadImage();
+    }, []);
     return (
         <AppBar position="static">
             <Toolbar>
@@ -40,7 +53,11 @@ function Header(){
                     color="inherit"
                     data-testid="icon-button"
                 >
-                    <AccountCircle />
+                    {
+                        profileImg && profileImg.length > 0 
+                        ? <Avatar src={img} alt={username} /> 
+                        : <AccountCircle />
+                    }
                 </IconButton>
                 <Menu
                     anchorEl={anchorEl}

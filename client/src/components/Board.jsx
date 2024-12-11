@@ -14,6 +14,7 @@ function Board({ board }){
 	const [openCreateTask, setOpenCreateTask] = useState(false);
 	const [openCollaborator, setOpenCollaborator] = useState(false);
 	const [displayTasks, setTasks] = useState([]);
+	const [collaborators, setCollaborators] = useState([]);
 
 	function setTaskClosed(){
 		setOpenCreateTask(false);
@@ -69,7 +70,20 @@ function Board({ board }){
 		}
 
 		async function loadCollaborators(){
-			getCollaboratorNames(board.id);	
+			if(board.id){
+				let collabs = await getCollaboratorNames(board.id);	
+				if(collabs.success){
+					let cs = [];
+					collabs.collaborators.map((c, idx) => {
+						cs.push({
+							name: c,
+							id: board.collaboratorIds[idx]
+						})
+					})
+
+					setCollaborators(cs);
+				}
+			}
 		}
 
 		loadCollaborators();
@@ -111,7 +125,7 @@ function Board({ board }){
 					)
 				})}
 			</div>
-			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} collaborators={board.collaboratorIds} showCollaborators={board.type === 'PUBLIC'} />
+			<CreateTaskDialog data-testid="task-dialog" open={openCreateTask} close={setTaskClosed} addTask={addTask} collaborators={collaborators} creatorId={board.creatorId} showCollaborators={board.type === 'PUBLIC'} />
 			<CollaboratorDialog open={openCollaborator} close={setCollaboratorClosed} addCollaborator={addCollab} />
 		</>	
 	)
