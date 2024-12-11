@@ -19,23 +19,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String token = extractTokenFromCookies(request.getCookies());
+        // extract token from Authorization header
+        String token = extractTokenFromHeader(request);
         if (token != null) {
+            // Validate token and get userId
             String userId = JwtUtil.validateToken(token);
             if (userId != null) {
+                // set authentication in the SecurityContext
                 Authentication auth = new UsernamePasswordAuthenticationToken(userId, null, null);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
+        // Continue the filter chain
         filterChain.doFilter(request, response);
     }
 
-    private String extractTokenFromCookies(Cookie[] cookies) {
-        if (cookies == null) return null;
-        for (Cookie cookie : cookies) {
-            if ("JWT-TOKEN".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
+    private String extractTokenFromHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
         }
         return null;
     }

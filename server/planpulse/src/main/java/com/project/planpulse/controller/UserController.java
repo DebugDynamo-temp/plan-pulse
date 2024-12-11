@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -66,19 +67,16 @@ public class UserController {
 
     // Delete own account
     @DeleteMapping("/profile")
-    public Map<String, String> deleteUser(Authentication authentication, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> deleteUser(Authentication authentication, HttpServletResponse response) {
         String userId = authentication.getName();
         userService.deleteUser(userId);
-        // Remove JWT cookie as user is deleted
-        removeTokenCookie(response);
-        return Map.of("message", "User account deleted successfully");
-    }
+        // Clear Authorization header logic
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, null); // Signal to the client to clear authorization
 
-    private void removeTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("JWT-TOKEN", null);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        Map<String, String> responseBody = Map.of("message", "User account deleted successfully");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(responseBody);
     }
 }
