@@ -12,5 +12,5 @@ public interface BoardRepository extends MongoRepository<Board, String> {
     List<Board> findByCreatorId(String creatorId);
 
     // Fetch boards where the user is a collaborator
-    List<Board> findByCollaboratorIds(String collaboratorId);
+    List<Board> findByCollaboratorIdsContaining(String userId);
 }

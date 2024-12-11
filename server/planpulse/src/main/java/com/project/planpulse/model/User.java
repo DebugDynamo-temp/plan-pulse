@@ -43,5 +43,6 @@ public class User {
     // only the profile-img URL stored in the user document
     private String profileImageUrl;
 
+    @Indexed
     private List<String> boardIds = new ArrayList<>();
 }

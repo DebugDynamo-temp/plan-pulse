@@ -5,7 +5,9 @@ import com.project.planpulse.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,16 +22,22 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/profile-image")
+    public ResponseEntity<Resource> serveProfileImage(Authentication authentication) {
+        String userId = authentication.getName();
+        return userService.loadProfileImage(userId);
+    }
+
     // Get user profile
     @GetMapping("/profile")
-    public Map<String, Object> getUserProfile(Authentication authentication) {
+    public User getUserProfile(Authentication authentication) {
         String userId = authentication.getName(); // user ID from JWT token
         return userService.getUserById(userId);
     }
 
     // Update user profile
     @PutMapping(value = "/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public Map<String, Object> updateUserProfile(
+    public User updateUserProfile(
             Authentication authentication,
             @RequestParam(name = "firstname", required = false) String firstname,
             @RequestParam(name = "lastname", required = false) String lastname,
