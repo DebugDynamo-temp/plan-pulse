@@ -85,12 +85,9 @@ async function updateUserProfile(data){
 
 async function getProfileImg(){
     try {
-        let response = await fetch(`${url}/users/profile-img`, {
+        let response = await fetch(`${url}/users/profile-image`, {
             method: "GET",
             credentials: 'include',
-            headers: new Headers({
-                "Content-Type": 'img/jpg'
-            })
         })
 
         if(response.status >= 400 && response.status < 500){

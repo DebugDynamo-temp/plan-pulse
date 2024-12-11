@@ -15,7 +15,7 @@ import { useContext } from "react";
 import UserContext from "../contexts/User";
 import { Typography } from "@mui/material";
 
-function CreateTaskDialog({ open, close, addTask, creatorName, collaborators, showCollaborators }){
+function CreateTaskDialog({ open, close, addTask, creatorId, collaborators, showCollaborators }){
 	const init = {
 		title: 'New Task',
 		assignee: '',
@@ -125,12 +125,14 @@ function CreateTaskDialog({ open, close, addTask, creatorName, collaborators, sh
 							<Select 
 								value={newTask.assignee}
 								id="assignee-select"
-								onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
+								onChange={(e) => setNewTask({...newTask, assigneeId: e.target.value})}
 							>
 								{collaborators.map((c, idx) => {
-									return <MenuItem key={`c-${idx}`} value={c}>{c}</MenuItem>
+									return <MenuItem key={`c-${idx}`} value={c.id}>{c.name}</MenuItem>
 								})}
-								<MenuItem value={userId}>{username}</MenuItem>
+								{ creatorId === userId ?
+								<MenuItem value={userId}>{username}</MenuItem>:
+								''}
 							</Select>
 						</FormControl>
 					</div> : ''
