@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import Task from "./Task";
 import { createTask, getTasksByBoard } from "../services/task";
 import CollaboratorDialog from "./CollaboratorDialog";
-import { addCollaborator } from "../services/board";
+import { addCollaborator, getCollaboratorNames } from "../services/board";
 import { Typography } from "@mui/material";
 
 function Board({ board }){
@@ -68,6 +68,11 @@ function Board({ board }){
 			}
 		}
 
+		async function loadCollaborators(){
+			getCollaboratorNames(board.id);	
+		}
+
+		loadCollaborators();
 		loadTasks();
 	}, [board])
 

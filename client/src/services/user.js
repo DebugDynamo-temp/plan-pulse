@@ -82,6 +82,35 @@ async function updateUserProfile(data){
     }
 }
 
+async function getProfileImg(){
+    try {
+        let response = await fetch(`${url}/users/profile`, {
+            method: "GET",
+            credentials: 'include',
+            headers: new Headers({
+                'Content-Type': 'image/*'
+            })
+        })
+
+        if(response.status >= 400 && response.status < 500){
+            throw "Authentication error";
+        } else if(response.status < 600 && response.status >= 500){
+            throw "Server error";
+        }
+
+        response = await response.json();
+        return {
+            success: true,
+            img: response
+        } 
+    } catch(e) {
+        return {
+            success: false,
+            err: e
+        }
+    }
+}
+
 async function resetPassword(email, currPswd, newPswd, confrimNewPswd){
     let resetForm = new FormData()
     resetForm.append('email', email);

@@ -21,6 +21,7 @@
     "react": "^18.3.1",
     "react-cookie": "^7.2.2",
     "react-dom": "^18.3.1",
+    "react-gauge-component": "^1.2.62",
     "react-hook-form": "^7.53.0",
     "react-quilljs": "^2.0.4",
     "react-router-dom": "^6.26.2",
