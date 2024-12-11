@@ -15,7 +15,8 @@ async function getUser(){
             method: "GET",
             credentials: 'include',
             headers: new Headers({
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('JWT-TOKEN')}`
             })
         })
 
