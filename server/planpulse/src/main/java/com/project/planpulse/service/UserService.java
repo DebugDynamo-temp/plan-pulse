@@ -11,12 +11,17 @@ import com.project.planpulse.repository.UserRepository;
 import com.project.planpulse.validation.PasswordValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,12 +46,10 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    @Autowired
-    private CloudStorageService cloudStorageService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
+    private static final String UPLOAD_DIR = "uploads/";
 
 
     // Register user with multipart (including optional profile image)
@@ -63,17 +66,8 @@ public class UserService {
         }
         // If profile image is provided, store it
         String profileImageUrl = null;
-        /*
-        // Local code:
         if (profileImage != null && !profileImage.isEmpty()) {
             profileImageUrl = storeProfileImage(profileImage);
-        }
-        */
-
-        // Cloud version
-        if (profileImage != null && !profileImage.isEmpty()) {
-            String destination = String.format("uploads/%s-%s", UUID.randomUUID(), profileImage.getOriginalFilename());
-            profileImageUrl = cloudStorageService.uploadFile(profileImage, destination);
         }
 
         User user = new User();
@@ -88,15 +82,14 @@ public class UserService {
     }
 
     // Update user with multipart (including optional profile image)
-    public Map<String, Object> updateUserWithMultipart(String userId,
-                                                       String username,
-                                                       String email,
-                                                       String firstname,
-                                                       String lastname,
-                                                       MultipartFile profileImage) throws IOException, RuntimeException {
-        Map<String, Object> userInfo = getUserById(userId);
-        User existingUser = (User) userInfo.get("user");
-        // Update fields if provided
+    public User updateUserWithMultipart(String userId,
+                                        String username,
+                                        String email,
+                                        String firstname,
+                                        String lastname,
+                                        MultipartFile profileImage) throws IOException, RuntimeException {
+        User existingUser = getUserById(userId);
+        // update fields if provided
         if (username != null && !username.isBlank()) {
             if (!existingUser.getUsername().equals(username) && userRepository.existsByUsername(username)) {
                 throw new RuntimeException("Username already taken");
@@ -116,8 +109,6 @@ public class UserService {
             existingUser.setLastname(lastname);
         }
 
-        /*
-        // Local code:
         // handle profile image update if new image is provided
         if (profileImage != null && !profileImage.isEmpty()) {
             String oldImageUrl = existingUser.getProfileImageUrl();
@@ -125,31 +116,13 @@ public class UserService {
             String newImageUrl = storeProfileImage(profileImage);
             // delete old image if it exists
             if (oldImageUrl != null && !oldImageUrl.isBlank()) {
-                deleteOldProfileImage(oldImageUrl);
+                deleteProfileImage(oldImageUrl);
             }
             // update user with the new URL
             existingUser.setProfileImageUrl(newImageUrl);
         }
-        */
 
-        // handle profile image update if new image is provided
-        if (profileImage != null && !profileImage.isEmpty()) {
-            String oldImageUrl = existingUser.getProfileImageUrl();
-            String destination = String.format("uploads/%s-%s", UUID.randomUUID(), profileImage.getOriginalFilename());
-            String newImageUrl = cloudStorageService.uploadFile(profileImage, destination);
-
-            // delete the old image from Cloud Storage if it exists
-            if (oldImageUrl != null && !oldImageUrl.isBlank()) {
-                String oldFileName = oldImageUrl.substring(oldImageUrl.lastIndexOf("/") + 1);
-                cloudStorageService.deleteFile("uploads/" + oldFileName);
-            }
-
-            // update the user profile image URL
-            existingUser.setProfileImageUrl(newImageUrl);
-        }
-
-        userInfo.put("user", userRepository.save(existingUser));
-        return userInfo;
+        return userRepository.save(existingUser);
     }
 
     private void validateUserRegistrationFields(String firstName, String lastName, String username, String email, String password, String confirmPassword) {
@@ -179,8 +152,6 @@ public class UserService {
         }
     }
 
-    /*
-    // Local version not using google cloud
     private String storeProfileImage(MultipartFile file) throws IOException, RuntimeException {
         if (file.isEmpty()) {
             throw new RuntimeException("File is empty. Please upload a valid image.");
@@ -200,7 +171,7 @@ public class UserService {
         }
         // unique filename generation below
         String extension = originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf('.')) : "";
-        String uniqueFilename = UUID.randomUUID() + "_" + System.currentTimeMillis() + extension;
+        String uniqueFilename = UUID.randomUUID() + "-" + System.currentTimeMillis() + extension;
 
         // create directory if it does not exist
         File uploadDir = new File(UPLOAD_DIR);
@@ -208,14 +179,141 @@ public class UserService {
             boolean uploadResult = uploadDir.mkdirs();
             if (!uploadResult) throw new IOException("Failed to create upload directory: " + UPLOAD_DIR);
         }
+
         // save file to the uploads directory
         Path filePath = Paths.get(UPLOAD_DIR, uniqueFilename);
         Files.write(filePath, file.getBytes(), StandardOpenOption.CREATE_NEW);
         System.out.println("File saved to: " + filePath.toAbsolutePath());
         // relative URL for storage in the database
-        return "/uploads/" + uniqueFilename;
+        return UPLOAD_DIR + uniqueFilename;
     }
-     */
+
+    private void deleteProfileImage(String imageUrl) {
+        // uploads/filename.extension - file format processed
+        if (imageUrl == null || !imageUrl.startsWith(UPLOAD_DIR)) {
+            return;
+        }
+        String filename = imageUrl.substring(UPLOAD_DIR.length());
+        Path filePath = Paths.get(UPLOAD_DIR, filename);
+        try {
+            boolean isDeleted = Files.deleteIfExists(filePath);
+            if (isDeleted) {
+                System.out.println("Deleted profile image: " + filePath.toAbsolutePath());
+            } else {
+                System.err.println("No file found to delete at: " + filePath.toAbsolutePath());
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to delete profile image: " + filePath + " - " + e.getMessage());
+        }
+    }
+
+    public ResponseEntity<Resource> loadProfileImage(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // profile image URL
+        String profileImageUrl = user.getProfileImageUrl();
+        if (profileImageUrl == null || profileImageUrl.isBlank()) {
+            throw new RuntimeException("No profile image found");
+        }
+
+        String filename = profileImageUrl.substring(UPLOAD_DIR.length());
+
+        // ensure the file format is supported
+        String lowerCaseFilename = filename.toLowerCase();
+        if (!hasValidImageExtension(filename)) {
+            throw new RuntimeException("Unsupported file format: " + filename);
+        }
+
+        // load the resource from storage
+        Path filePath = Paths.get(UPLOAD_DIR, filename).normalize();
+        try {
+            Resource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("File not found or not readable: " + filename);
+            }
+
+            // get the mime type of the image
+            MediaType contentType = checkContentType(filename);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .contentType(contentType)
+                    .body(resource);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("File not found or not readable: " + filename);
+        }
+    }
+
+    public MediaType checkContentType(String fileName) {
+        try {
+            String mimeType = Files.probeContentType(Paths.get(fileName));
+            return mimeType != null ? MediaType.parseMediaType(mimeType) : MediaType.APPLICATION_OCTET_STREAM;
+        } catch (IOException e) {
+            return MediaType.APPLICATION_OCTET_STREAM; // default to binary stream if MIME type is unknown
+        }
+    }
+
+
+    public void deleteUser(String userId) throws RuntimeException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // delete user profile image if exists
+        String imageUrl = user.getProfileImageUrl();
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            deleteProfileImage(imageUrl);
+        }
+
+        // handle boards created by the user
+        List<Board> createdBoards = boardRepository.findByCreatorId(userId);
+        for (Board board : createdBoards) {
+            List<String> collaboratorIds = board.getCollaboratorIds();
+
+            // check if the board has no other collaborators and remove the board along with tasks
+            if (collaboratorIds == null || collaboratorIds.isEmpty() || (collaboratorIds.size() == 1 && collaboratorIds.contains(userId))) {
+                List<Task> tasks = taskRepository.findByBoardId(board.getId());
+                taskRepository.deleteAll(tasks);
+                boardRepository.delete(board);
+            } else {
+                // if not, then only update collaborators
+                collaboratorIds.remove(userId);
+                board.setCollaboratorIds(collaboratorIds);
+                boardRepository.save(board);
+            }
+        }
+
+        // handle boards where the user is a collaborator
+        List<Board> collaboratingBoards = boardRepository.findByCollaboratorIdsContaining(userId);
+        for (Board board : collaboratingBoards) {
+            List<String> collaboratorIds = board.getCollaboratorIds();
+
+            // remove the user from collaborators
+            collaboratorIds.remove(userId);
+
+            // If no collaborators and no creator remain then delete the board & tasks
+            boolean noRemainingUsers = (collaboratorIds == null || collaboratorIds.isEmpty())
+                    && (board.getCreatorId() == null || board.getCreatorId().isBlank());
+
+            if (noRemainingUsers) {
+                // delete the board & tasks
+                List<Task> tasks = taskRepository.findByBoardId(board.getId());
+                taskRepository.deleteAll(tasks);
+                boardRepository.delete(board);
+            } else {
+                // update the board with the remaining collaborators
+                board.setCollaboratorIds(collaboratorIds);
+                boardRepository.save(board);
+            }
+        }
+
+        userRepository.deleteById(userId);
+    }
+
+    public User getUserById(String userId) throws RuntimeException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Invalid user credentials"));
+    }
 
     private boolean isValidImageMimeType(String mimeType) {
         return mimeType.equals("image/jpeg") ||
@@ -268,24 +366,6 @@ public class UserService {
         return false;
     }
 
-    /*
-    // Local version (not using google cloud)
-    private void deleteOldProfileImage(String imageUrl) {
-        // /uploads/filename.extension - file format processed
-        if (!imageUrl.startsWith("/uploads/")) {
-            return;
-        }
-        String filename = imageUrl.substring("/uploads/".length());
-        Path oldFilePath = Paths.get(UPLOAD_DIR, filename);
-        try {
-            Files.deleteIfExists(oldFilePath);
-            System.out.println("Deleted old profile image: " + oldFilePath.toAbsolutePath());
-        } catch (IOException e) {
-            System.err.println("Failed to delete old profile image: " + oldFilePath + " - " + e.getMessage());
-        }
-    }
-     */
-
     public User authenticateByUsername(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Invalid login credentials"));
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
@@ -300,78 +380,6 @@ public class UserService {
             return user;
         }
         return null;
-    }
-
-    public Map<String, Object> getUserById(String userId) throws RuntimeException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // retrieve the profile image as a Resource from cloud
-        Resource profileImage = null;
-        String profileImageUrl = user.getProfileImageUrl();
-
-        if (profileImageUrl != null && !profileImageUrl.isBlank()) {
-            try {
-                String fileName = profileImageUrl.substring(profileImageUrl.lastIndexOf("/") + 1);
-                profileImage = cloudStorageService.downloadFile(fileName);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to load profile image: " + e.getMessage());
-            }
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("user", user);
-        response.put("profileImage", profileImage);
-        return response;
-    }
-
-//    public User getUserByEmail(String email, String requesterId) {
-//        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
-//        if (!user.getId().equals(requesterId)) {
-//            throw new RuntimeException("Unauthorized access");
-//        }
-//        return user;
-//    }
-
-    public void deleteUser(String userId) throws RuntimeException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // delete user's profile image if exists from cloud
-        String imageUrl = user.getProfileImageUrl();
-        if (imageUrl != null && !imageUrl.isBlank()) {
-            String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-            cloudStorageService.deleteFile("uploads/" + fileName);
-        }
-
-        // get all boards created by the user
-        List<Board> boards = boardRepository.findByCreatorId(user.getId());
-
-        // delete associated tasks and update collaborators
-        for (Board board : boards) {
-            // delete all tasks associated with the board
-            List<Task> tasks = taskRepository.findByBoardId(board.getId());
-            taskRepository.deleteAll(tasks);
-
-            // update collaborators for the board
-            List<String> collaboratorIds = board.getCollaboratorIds();
-            if (collaboratorIds != null && !collaboratorIds.isEmpty()) {
-                for (String collaboratorId : collaboratorIds) {
-                    userRepository.findById(collaboratorId).ifPresent(collaborator -> {
-                        if (collaborator.getBoardIds() != null) {
-                            collaborator.getBoardIds().remove(board.getId());
-                            userRepository.save(collaborator);
-                        }
-                    });
-                }
-            }
-        }
-
-        // delete all boards created by the user
-        boardRepository.deleteAll(boards);
-
-        // then delete the user
-        userRepository.deleteById(userId);
     }
 
     public void initiatePasswordReset(String email) throws RuntimeException {

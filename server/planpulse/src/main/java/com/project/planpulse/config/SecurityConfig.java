@@ -24,13 +24,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable) // disable CSRF for APIs
                 .cors(Customizer.withDefaults()) // enable CORS with default settings
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // stateless application
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // unauthenticated access to /auth/** endpoints
                         .anyRequest().authenticated() // needs authentication for all other endpoints
-                )
-                .formLogin(AbstractHttpConfigurer::disable) // disable the form login (default) or the UsernamePasswordAuthenticationFilter
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                ).addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, e) -> {
                             res.setContentType("application/json");

@@ -11,6 +11,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BoardService {
@@ -31,7 +32,7 @@ public class BoardService {
         // fetch boards where the user is the creator
         List<Board> createdBoards = boardRepository.findByCreatorId(userId);
         // fetch boards where the user is a collaborator
-        List<Board> collaboratorBoards = boardRepository.findByCollaboratorIds(userId);
+        List<Board> collaboratorBoards = boardRepository.findByCollaboratorIdsContaining(userId);
         // combining the two lists
         Set<Board> allBoards = new HashSet<>(createdBoards);
         allBoards.addAll(collaboratorBoards);
@@ -108,6 +109,23 @@ public class BoardService {
         boardRepository.save(board);
 
         return savedTask;
+    }
+
+    public List<String> getCollaboratorUsernames(String boardId, String requesterId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new RuntimeException("No such board"));
+        validateAddPermission(board, requesterId);
+        List<String> collaboratorIds = board.getCollaboratorIds();
+        if (collaboratorIds == null || collaboratorIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return collaboratorIds.stream()
+                .map(
+                        userId -> userRepository.findById(userId)
+                                .map(User::getUsername)
+                                .orElse(null) // for cases where a user might be deleted
+                )
+                .filter(Objects::nonNull) // filter out null values
+                .collect(Collectors.toList());
     }
 
     private void validateAddPermission(Board board, String requesterId) {
