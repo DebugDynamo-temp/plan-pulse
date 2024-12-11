@@ -10,16 +10,20 @@ import org.springframework.web.filter.CorsFilter;
 public class CorsConfig {
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfiguration corsConfiguration() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOriginPattern("*"); // Allow all origins dynamically
-        corsConfiguration.addAllowedHeader("*"); // Allow all headers
-        corsConfiguration.addAllowedMethod("*"); // Allow all methods
-        corsConfiguration.setAllowCredentials(true); // Allow cookies/credentials
+        corsConfiguration.addAllowedOriginPattern("*"); // all origins
+        corsConfiguration.addAllowedHeader("*"); // all headers
+        corsConfiguration.addAllowedMethod("*"); // all HTTP methods
+        corsConfiguration.setAllowCredentials(true); // cookies/credentials
+        return corsConfiguration;
+    }
 
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return new CorsFilter(source);
+        source.registerCorsConfiguration("/**", corsConfiguration());
+        return source;
     }
 }
 

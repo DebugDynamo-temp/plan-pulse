@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +26,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // enable CORS with default settings
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // unauthenticated access to /auth/** endpoints
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow all pre-flight requests
                         .anyRequest().authenticated() // needs authentication for all other endpoints
                 ).addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
