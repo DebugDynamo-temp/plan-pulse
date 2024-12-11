@@ -1,5 +1,3 @@
-import Cookies from 'js-cookie';
-
 const url = import.meta.env.VITE_BACKEND_URL;
 
 const jsonContentType = new Headers({
@@ -24,11 +22,12 @@ async function login(identifier, pswd){
         }
 
         response = await response.json();
-        Cookies.set('JWT-TOKEN', response.token);
+        localStorage.setItem('JWT-TOKEN', response.token.substring(7));
         return { 
             success: true,
         }
     } catch(e) {
+        console.log(e);
         return {
             success: false,
             err: e
@@ -59,8 +58,9 @@ async function register(first, last, email, uname, pswd, confirmPswd){
         }
 
         response = await response.json();
+        console.log(response.token.substring(7));
 
-        Cookies.set('JWT-TOKEN', response.token, { expires: 1 });
+        localStorage.setItem('JWT-TOKEN', response.token.substring(7));
         return {
             success: true,
             user: response
@@ -81,7 +81,7 @@ async function logout(){
         }) 
 
         response = await response.json();
-        Cookies.remove('JWT-TOKEN');
+        localStorage.clear('JWT-TOKEN');
 
         return {
             success: true
@@ -106,7 +106,6 @@ async function forgotPassword(email){
         }) 
 
         response = await response.json();
-        Cookies.remove('JWT-TOKEN');
 
         return {
             success: true

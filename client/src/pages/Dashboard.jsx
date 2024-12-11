@@ -34,7 +34,7 @@ function Dashboard(){
 				nav('/not-authed');
 				return;
 			}
-			updateUser(loadedUser);
+			await updateUser(loadedUser);
 
 			let res = await getBoards();
 			if(res.success){

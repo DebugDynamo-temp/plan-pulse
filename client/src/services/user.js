@@ -1,9 +1,8 @@
-import Cookies from 'js-cookie';
 
 const url = import.meta.env.VITE_BACKEND_URL;
 
 async function getUser(){
-    if(!Cookies.get('JWT-TOKEN')){
+    if(!localStorage.getItem('JWT-TOKEN')){
         return {
             success: false,
             msg: 'No Token'
@@ -16,7 +15,7 @@ async function getUser(){
             credentials: 'include',
             headers: new Headers({
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Cookies.get('JWT-TOKEN')}`
+                'Authorization': `Bearer ${localStorage.getItem('JWT-TOKEN')}`
             })
         })
 
@@ -63,7 +62,10 @@ async function updateUserProfile(data){
         let response = await fetch(`${url}/users/profile`, {
             method: "PUT",
             credentials: 'include',
-            body: formData 
+            body: formData, 
+            headers: new Headers({
+                'Authorization': `Bearer ${localStorage.getItem('JWT-TOKEN')}`
+            })
         })
 
         if(response.status >= 400 && response.status < 500){
@@ -89,6 +91,9 @@ async function getProfileImg(){
         let response = await fetch(`${url}/users/profile-image`, {
             method: "GET",
             credentials: 'include',
+            headers: new Headers({
+                'Authorization': `Bearer ${localStorage.getItem('JWT-TOKEN')}`
+            })
         })
 
         if(response.status >= 400 && response.status < 500){
