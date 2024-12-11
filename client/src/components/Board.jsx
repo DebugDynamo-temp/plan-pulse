@@ -69,7 +69,10 @@ function Board({ board }){
 		}
 
 		async function loadCollaborators(){
-			getCollaboratorNames(board.id);	
+			if(board.id){
+				let collabs = await getCollaboratorNames(board.id);	
+				console.log(collabs);
+			}
 		}
 
 		loadCollaborators();

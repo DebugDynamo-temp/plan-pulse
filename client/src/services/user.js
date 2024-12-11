@@ -28,11 +28,12 @@ async function getUser(){
         response = await response.json();
         return {
             success: true,
-            email: response.user.email,
-            uname: response.user.username,
-            first: response.user.firstname,
-            last: response.user.lastname,
-            id: response.user.id
+            email: response.email,
+            uname: response.username,
+            first: response.firstname,
+            last: response.lastname,
+            id: response.id,
+            img: response.profileImageUrl
         } 
     } catch(e) {
         return {
@@ -84,11 +85,11 @@ async function updateUserProfile(data){
 
 async function getProfileImg(){
     try {
-        let response = await fetch(`${url}/users/profile`, {
+        let response = await fetch(`${url}/users/profile-img`, {
             method: "GET",
             credentials: 'include',
             headers: new Headers({
-                'Content-Type': 'image/*'
+                "Content-Type": 'img/jpg'
             })
         })
 
@@ -98,7 +99,8 @@ async function getProfileImg(){
             throw "Server error";
         }
 
-        response = await response.json();
+        response = await response.blob();
+
         return {
             success: true,
             img: response
@@ -144,6 +146,7 @@ async function resetPassword(email, currPswd, newPswd, confrimNewPswd){
 }
 
 export {
+    getProfileImg,
     getUser,
     resetPassword,
     updateUserProfile
